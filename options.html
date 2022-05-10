@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html data-context="options-page">
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    
+    <title class="i18n" data-msg="google_calendar_extension_name">Options</title>
+
+	  <link rel="stylesheet" type="text/css" href="css/semantic.min.css">
+	  <script type="text/javascript" src="js/jquery-1.9.1.min.js"></script>
+	  <script type="text/javascript" src="js/semantic.min.js"></script>
+	  <script type="text/javascript" src="js/logger.js"></script>
+	  <script type="text/javascript" src="js/common.js"></script>
+	  <script type="text/javascript" src="js/userInfo.js"></script>
+	  <script type="text/javascript" src="js/UserSession.js"></script>
+	  <script type="text/javascript" src="js/options.js"></script>
+      <script src="https://www.gstatic.com/firebasejs/5.9.2/firebase.js"></script>
+	  <script type="text/javascript" src="js/FirebaseApp.js"></script>
+	  <style>
+		  body {margin: 20px;}
+
+		  .comment {
+			  color: gray;
+			  font-size: 13px;
+		  }
+
+	  </style>
+  </head>
+  <body>
+
+  <form class="two ui form">
+
+	  <h1 class="ui header">그룹웨어 출퇴근 자동체크</h1>
+	  <div class="ui bulleted list">
+		  <div class="item">출/퇴근시간 1시간 후에는 자동으로 출/퇴근체크를 하지 않습니다.</div>
+		  <div class="item">예) 출근 9시일 경우 10시 이후에는 체크하지 않음</div>
+		  <div class="item">예) 퇴근 18시일 경우 19시 이후에는 체크하지 않음</div>
+
+
+	  </div>
+
+	  <div class="ui divider"></div>
+
+	  <h4 class="ui dividing header">로그인 정보
+	  <span class="comment">&nbsp;&nbsp;(비밀번호는 사용자 PC에만 저장됩니다)</span>
+	  </h4>
+	  <div class="fields">
+		  <div class="field">
+			  <label>사원번호</label>
+			  <input type="text" name="username" id="username" placeholder="예) 2001001">
+		  </div>
+		  <div class="field">
+			  <label>비밀번호</label>
+			  <input type="password" name="password" id="password" placeholder="">
+		  </div>
+		  <div class="field">
+			  <label>&nbsp;</label>
+			  <div class="ui button primary" id="btnCheckUsernameAndPassword">확인</div>
+		  </div>
+	  </div>
+
+	  <h4 class="ui dividing header">출퇴근 시간 자동설정 사용여부</h4>
+	  <div class="inline field">
+		  <div class="ui toggle checkbox use-flag">
+			  <input type="checkbox" tabindex="0" id="use-flag">
+			  <label>사용여부</label>
+		  </div>
+	  </div>
+
+	  <h4 class="ui dividing header">출근 시간</h4>
+	  <div class="fields">
+		  <div class="field">
+			  <select class="ui dropdown" id="clock-in-hour">
+				  <option value="07">7시</option>
+				  <option value="08">8시</option>
+				  <option value="09">9시</option>
+				  <option value="10">10시</option>
+				  <option value="11">11시</option>
+				  <option value="12">12시</option>
+			  </select>
+		  </div>
+		  <div class="field">
+			  <select class="ui dropdown" id="clock-in-minute">
+				  <option value="00">0분</option>
+				  <option value="30">30분</option>
+			  </select>
+		  </div>
+	  </div>
+
+	  <h4 class="ui dividing header">퇴근 시간</h4>
+	  <div class="fields">
+		  <div class="field">
+			  <select class="ui dropdown" id="clock-out-hour">
+				  <option value="16">16시</option>
+				  <option value="17">17시</option>
+				  <option value="18">18시</option>
+				  <option value="19">19시</option>
+				  <option value="20">20시</option>
+				  <option value="21">21시</option>
+			  </select>
+		  </div>
+		  <div class="field">
+			  <select class="ui dropdown" id="clock-out-minute">
+				  <option value="00">0분</option>
+				  <option value="30">30분</option>
+			  </select>
+		  </div>
+	  </div>
+
+	  <h4 class="ui dividing header">출근 시간 체크 방법</h4>
+	  <div>
+		  <h5 class="ui top attached header">
+			  <input type="radio" name="clock-in-check-type" value="TIME">
+			  <label>정해진 시간</label>
+			  <select id="clock-in-before-minute" style="width:auto; display:inline"></select>
+		  </h5>
+		  <div class="ui attached segment comment">
+
+
+			  예) 출근시간 9시에 5분전으로 설정하면 8:55분에 출근시간으로 설정이 됩니다.
+		  </div>
+		  <h5 class="ui attached header">
+			  <input type="radio" name="clock-in-check-type" value="RANDOM">
+			  <label>랜덤 시간</label>
+
+			  (출근시간 <select id="clock-in-random-from-minute" style="width:auto; display:inline"></select> ~
+			  <select id="clock-in-random-to-minute" style="width:auto; display:inline"></select>)
+
+		  </h5>
+		  <div class="ui attached segment comment">
+			  <p>출근시간 9시(10분 전 ~ 5분 전) ==> 08:50 ~ 08:55분 사이 랜덤으로 설정</p>
+		  </div>
+	  </div>
+
+	  <h4 class="ui dividing header">퇴근 시간 체크 방법</h4>
+	  <div>
+		  <h5 class="ui top attached header">
+			  <input type="radio" name="clock-out-check-type" value="TIME">
+			  <label>정해진 시간</label>
+			  <select id="clock-out-after-minute" style="width:auto; display:inline"></select>
+		  </h5>
+		  <div class="ui attached segment comment">
+			  예) 퇴근시간 18시에 5분후로 설정하면 18:05분에 퇴근시간으로 설정이 됩니다.
+		  </div>
+		  <h5 class="ui attached header">
+			  <input type="radio" name="clock-out-check-type" value="RANDOM">
+			  <label>랜덤 시간</label>
+
+			  (퇴근시간 <select id="clock-out-random-from-minute" style="width:auto; display:inline"></select> ~
+			  <select id="clock-out-random-to-minute" style="width:auto; display:inline"></select>)
+
+		  </h5>
+		  <div class="ui attached segment comment">
+			  <p>퇴근시간 18시(5분 후 ~ 10분 후) ==> 18:05 ~ 18:10분 사이 랜덤으로 설정</p>
+		  </div>
+	  </div>
+
+	  <div class="ui divider"></div>
+
+	  <div class="ui button primary" id="btnSave">저장하기</div>
+	  <div class="ui button" id="btnReset">초기화</div>
+
+	  <div class="ui divider"></div>
+
+	  모바일 화면에서 출퇴근 사용여부 설정을 할 수 있습니다.
+	  아래 링크를 핸드폰의 바로가기로 추가하여 설정변경 하세요.
+	  <br/>
+	  <a href="https://spectra-groupware.firebaseapp.com/config.html">
+		  https://spectra-groupware.firebaseapp.com/config.html
+	  </a>
+
+	  <div class="ui divider"></div>
+
+	  소스파일은 여기에 ==>
+
+	  <a href="https://github.com/rudaks-han/chrome-extension/tree/master/%EC%B6%9C%ED%87%B4%EA%B7%BC%EC%B2%B4%ED%81%AC" class="item" target="_blank">
+		  https://github.com/rudaks-han/chrome-extension/tree/master/%EC%B6%9C%ED%87%B4%EA%B7%BC%EC%B2%B4%ED%81%AC
+	  </a>
+  </form>
+
+  <div>&nbsp;</div>
+  <div>&nbsp;</div>
+  <div>&nbsp;</div>
+
+  </body>
+</html>

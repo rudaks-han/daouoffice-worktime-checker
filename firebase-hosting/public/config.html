@@ -1,0 +1,199 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>출퇴근 사용여부 세팅</title>
+    <meta name="viewport" content="width=device-width, user-scalable=no">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.9/semantic.min.css"/>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.9/semantic.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/5.9.2/firebase.js"></script>
+    <!--<script src="/js/logger.js"></script>-->
+    <script src="/js/common.js"></script>
+    <script src="/js/FirebaseApp.js"></script>
+
+    <style>
+        body { margin: 30px;}
+        #message-layer { position: fixed; top: 0; width: 85%;}
+    </style>
+</head>
+<body>
+
+<form class="two ui form">
+
+    <h1 class="ui header">그룹웨어 출퇴근 자동체크</h1>
+    <div class="ui bulleted list">
+        <div class="item">모바일에서 사용여부를 설정하시면 PC에 출퇴근 사용여부 정보가 변경됩니다.</div>
+    </div>
+
+    <div class="ui divider"></div>
+
+    <h4 class="ui dividing header">로그인 정보</h4>
+    <div class="fields">
+        <div class="field">
+            <label>사원번호</label>
+            <input type="text" name="username" id="username" placeholder="예) 2001001">
+        </div>
+        <!--<div class="field">
+            <label>비밀번호</label>
+            <input type="password" name="password" id="password" placeholder="">
+        </div>-->
+        <div class="field">
+            <label>&nbsp;</label>
+            <div class="ui button primary" id="btnCheckUsernameAndPassword">확인</div>
+        </div>
+    </div>
+
+    <h4 class="ui dividing header">출퇴근 시간 자동설정 사용여부</h4>
+    <div class="inline field">
+        <div class="ui toggle checkbox use-flag">
+            <input type="checkbox" tabindex="0" id="use-flag">
+            <label>사용여부</label>
+        </div>
+    </div>
+
+    <div class="ui button primary" id="btnSave">저장하기</div>
+
+</form>
+
+
+
+<script>
+    let userConfigVal = {};
+    const cookieName = 'c_userNo'; // 사전
+    let userConfigLoaded = false;
+	let firebaseApp;
+	let _firebase;
+
+	const worktime_checker = "worktime_checker";
+	const user_config = "user_config";
+
+    $(function() {
+		$('#btnCheckUsernameAndPassword').on('click', () => {
+			const username = $('#username').val();
+
+			if (username == '') {
+				showNotification('Message', '사번을 입력하세요.');
+				return;
+			}
+
+			getUserConfig($('#username').val())
+
+		});
+
+		$('#btnSave').on('click', () => {
+			const username = $('#username').val();
+			const useFlag = $('#use-flag').is(':checked') ? 'Y' : 'N';
+
+			updateUserConfig(username, useFlag);
+        });
+
+		const cookieUserNo = getCookie(cookieName);
+		if (cookieUserNo) {
+			$('#username').val(cookieUserNo);
+        }
+
+		enableBtnSave(false);
+
+		//firebaseInit();
+		firebaseApp = new FirebaseApp();
+		firebaseApp.init();
+	});
+
+	function getUserConfig(username) {
+		firebaseApp.get(firebaseApp.user_config + '/' + username, snapshot => {
+			if (snapshot.val() == null)
+			{
+				showNotification('Message', '사번이 잘못되었습니다.')
+				return;
+			}
+
+			let { value } = snapshot.val();
+			userConfigVal = value;
+
+			let useFlag = value['use-flag'];
+
+			enableBtnSave(true);
+
+			if (useFlag === 'Y') {
+				$('.ui.toggle.checkbox.use-flag').checkbox('set checked');
+			} else {
+				$('.ui.toggle.checkbox.use-flag').checkbox('set unchecked');
+			}
+
+			setCookie(cookieName, username, 365);
+			userConfigLoaded = true;
+
+			showNotification('Message', '조회되었습니다.')
+		});
+	}
+
+	function enableBtnSave(flag) {
+		if (flag) {
+			$('.ui.toggle.checkbox.use-flag').removeClass('disabled');
+			$('#btnSave').removeClass('disabled');
+        } else {
+			$('.ui.toggle.checkbox.use-flag').addClass('disabled');
+			$('#btnSave').addClass('disabled');
+        }
+     }
+
+	function updateUserConfig(username, useFlag) {
+		const firebaseKey = user_config + '/' + username;
+
+		const useFlagJson = {'use-flag' : useFlag};
+		let val = {...userConfigVal, ...useFlagJson};
+
+		Promise.resolve()
+            .then(() => firebaseApp.set(firebaseKey, val))
+            .then(() => showNotification('Message', '정보가 저장되었습니다.'))
+    }
+
+    function showNotification(title, message) {
+		let str = "<div class=\"ui positive message\" id='message-layer'>" +
+                    "<i class=\"close icon\"></i>" +
+                    "<div class=\"header\">" +
+                        title +
+                    "</div>" +
+                    "<p>" +
+                    message +
+                    "</p>" +
+                    "</div>";
+
+		$(str).appendTo('body').fadeIn('slow').delay(3000);//.fadeOut('slow');
+    }
+/*
+	function firebaseInit()
+	{
+		const config = {
+			apiKey: "AIzaSyBeWHyVqAAk-kXXPtsEg-4IK66P9Xjma4A",
+			authDomain: "spectra-groupware.firebaseapp.com",
+			databaseURL: "https://spectra-groupware.firebaseio.com",
+			projectId: "spectra-groupware",
+			storageBucket: "spectra-groupware.appspot.com",
+			messagingSenderId: "785900078227"
+		};
+		_firebase = firebase.initializeApp(config);
+	}
+
+	//writeLog(date, user, key, value)
+	function setFirebase(key, value)
+	{
+		_firebase.database().ref(key).set({
+			value
+		});
+	}
+
+	function getFirebase(key, callback)
+	{
+		var ref = _firebase.database().ref(key);
+		ref.on('value', function(snapshot) {
+			callback(snapshot);
+		});
+	}*/
+</script>
+
+
+</body>
+</html>
