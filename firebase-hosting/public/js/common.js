@@ -1,6 +1,5 @@
 
-function requestAjax(options)
-{
+function requestAjax(options) {
     logger.trace('======= Ajax Request ======');
     logger.trace('[url] ' + options.url);
     logger.trace('[method] ' + options.method);
@@ -23,8 +22,7 @@ function requestAjax(options)
     });
 }
 
-function getCurrDate()
-{
+function getCurrDate() {
     var currDate = new Date();
     var year = currDate.getFullYear();
     var month = (currDate.getMonth() + 1);
@@ -37,8 +35,7 @@ function getCurrDate()
     return year + '-' + month + '-' + day;
 }
 
-function getCurrTime()
-{
+function getCurrTime() {
     var currDate = new Date();
     var hour = currDate.getHours();
     if (hour < 10)
@@ -53,8 +50,7 @@ function getCurrTime()
     return hour + ':' + minute + ':' + second;
 }
 
-function getCurrYear()
-{
+function getCurrYear() {
     var currDate = new Date();
     return currDate.getFullYear();
 }
@@ -69,8 +65,7 @@ function getCurrMonth()
     return month;
 }
 
-function getCurrDay()
-{
+function getCurrDay() {
     var currDate = new Date();
     var day = currDate.getDate();
     if (day < 10)
@@ -114,8 +109,7 @@ function showNotify(title, message, requireInteraction = false) {
 }
 
 // chrome.storage.sync에 저장된 정보를 promise로 가져온다.
-function promiseStorageSync(syncStorageId, userConfigId)
-{
+function promiseStorageSync(syncStorageId, userConfigId) {
     return new Promise(function(resolve, reject) {
         chrome.storage.sync.get(syncStorageId, function(items) {
             syncStorage[syncStorageId] = items[syncStorageId];
@@ -132,8 +126,7 @@ function randomRange(n1, n2) {
     return Math.floor( (Math.random() * (n2 - n1 + 1)) + n1 );
 }
 
-function getChromeStorageSync(item, callback)
-{
+function getChromeStorageSync(item, callback) {
     chrome.storage.sync.get(item, callback);
 }
 

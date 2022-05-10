@@ -1,3 +1,12 @@
+import Share from './js/lib/Share.js';
+import Logger from './js/lib/logger.js';
+import UserSession from "./js/UserSession.js";
+import WorkHourChecker from './js/WorkHourChecker.js';
+
+const logger = new Logger();
+const userSession = new UserSession();
+const workHourChecker = new WorkHourChecker();
+
 
 let GOSSOcookie = '';
 
@@ -26,42 +35,40 @@ function checkNoticeMessage() {
     const key = 'notification-id';
     const expectedValue = '190627-notification';
 
-    const value = getLocalStorage(key);
+    const value = Share.getLocalStorage(key);
 
     if (!value || value !== expectedValue) {
         const msg = '그룹웨어(출퇴근 체크) 정보가 변경되어 설정화면으로 이동 후 다시 저장버튼을 클릭해주세요.';
         showBgNotification('그룹웨어 출퇴근체크', msg, true);
-        saveLocalStorage(key, expectedValue)
+        Share.saveLocalStorage(key, expectedValue)
     }
 }
 
 function init() {
-	firebaseConfigTimer = setInterval(() => {
+    firebaseConfigTimer = setInterval(() => {
         firebaseConfigChecker.get(userInfo.username)
     }, firebaseConfigCheckerInterval); // 세션정보 5분마다 가져온다.
 
     // 사용여부 체크
-    getChromeStorageSync('use-flag', (items) => {
+    Share.getStorage('use-flag', (items) => {
         let useFlag = items['use-flag'];
 
-		if (useFlag !== 'Y')
+        if (useFlag !== 'Y')
         {
             logger.info('>>> 출퇴근 체크가 사용하지 않음으로 설정되어 있습니다.');
         }
 
-		check();
+        check();
     });
 }
 
 init();
 
-const workHourChecker = new WorkHourChecker();
 
 function check() {
-    const userSession = new UserSession();
     userSession.getSession();
 
-    let promises =
+    /*let promises =
         [
             workHourChecker.getUserConfig(),
             userSession.getSession(),
@@ -95,7 +102,7 @@ function check() {
 
 
         }, checkInterval); // 출퇴근시간 체크 (1분마다 체크)
-    });
+    });*/
 }
 
 /**
@@ -103,19 +110,18 @@ function check() {
  */
 let receiveMessage = function(request, sender, sendResponse)
 {
-	logger.debug('receiveMessage');
+    logger.debug('receiveMessage');
     //logger.debug(JSON.stringify(request));
-	if (request.action == 'gotoDaouoffice')
-	{
-		window.open('https://spectra.daouoffice.com');
-	}
-	else if (request.action == 'notification')
+    if (request.action == 'gotoDaouoffice')
+    {
+        window.open('https://spectra.daouoffice.com');
+    }
+    else if (request.action == 'notification')
     {
         showBgNotification(request.title, request.message, request.requireInteraction);
     }
     else if (request.action == 'btnClockIn')
     {
-        const userSession = new UserSession();
         userSession.loginAfterGetStorage(function() {
             const workHourMarker = new WorkHourMarker();
             workHourMarker.requestClockIn();
@@ -158,15 +164,6 @@ function showBgNotification(title, message, requireInteraction = false) {
             message: message,
             requireInteraction: requireInteraction
         };
-
-        /*chrome.notifications.create(id, options, function() {
-            setInterval(function() {
-                var time = Date.now() - start;
-                chrome.notifications.update(id, {
-                    message,
-                }, function() { });
-            }, 1000);
-        });*/
 
         chrome.notifications.create(options);
 
