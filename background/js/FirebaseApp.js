@@ -76,7 +76,7 @@ class FirebaseApp {
 		const _this = this;
 		const buildRef = ref(this.db, `build-status/dummy`);
 		onValue(buildRef, (snapshot) => {
-			_this.printLog(`dummy test callback`);
+			console.log('dummy test callback');
 		});
 	}
 
@@ -85,7 +85,7 @@ class FirebaseApp {
 		if (!this.firebaseEventAttached) {
 			const accessLogRef = ref(db, `access_logs`);
 			onValue(accessLogRef, (snapshot) => {
-				_this.printLog('firebaseEvent attached');
+				console.log('firebaseEvent attached');
 			}, {
 				onlyOnce: true
 			});
@@ -101,24 +101,37 @@ class FirebaseApp {
 		logger.trace('key: ' + key);
 		logger.trace('value: ' + value);
 
-		this._firebase.database().ref(key).set({
+		/*this._firebase.database().ref(key).set({
 			value
-		});
+		});*/
+
+		const db = this.db;
+		set(ref(db, key), value);
 	}
 
-	get(key, callback)
+	async get(key)
 	{
-		let ref = this._firebase.database().ref(key);
+		/*let ref = this._firebase.database().ref(key);
 		ref.on('value', function(snapshot) {
 			callback(snapshot);
-		});
+		});*/
+
+		const db = this.db;
+		const valueRef = ref(db, key);
+		const snapshot = await get(valueRef);
+		return snapshot.val();
 	}
 
-	log(itemId, value)
+	/*log(itemId, value)
 	{
 		const key = `${this.api_log}/${getCurrDate()}/${itemId}/${getCurrTime()}`;
 
 		this.set(key, value);
+	}*/
+
+	accessLog = (path, value) => {
+		const db = this.db;
+		set(ref(db, 'api_log/' + path), value);
 	}
 }
 

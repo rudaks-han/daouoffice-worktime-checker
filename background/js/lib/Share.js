@@ -1,42 +1,7 @@
-import Logger from './logger.js';
 import HttpRequest from './httpRequest.js';
-
-const logger = new Logger();
 
 class Share {
 
-    static saveLocalStorage(key, value) {
-        localStorage[key] = value;
-    }
-
-    static getLocalStorage(key) {
-        return localStorage[key];
-    }
-
-    static requestAjax(url, options) {
-        /*logger.trace('======= Ajax Request ======');
-        logger.trace('[url] ' + options.url);
-        logger.trace('[method] ' + options.method);
-        if (options.headers)
-            logger.trace('[headers] ' + options.headers);
-        if (options.data)
-            logger.trace('[data] ' + options.data);
-        logger.trace('=========================');
-
-        return $.ajax({
-            type: options.method,
-            url: options.url,
-            headers: options.headers,
-            data: options.param,
-            dataType: "json",
-            contentType: "application/json", // request payload로 전송됨
-            success : options.success,
-            error : options.error,
-            complete : options.complete
-        });*/
-
-        return HttpRequest.request(url, options);
-    }
 
     static getCurrDate() {
         var currDate = new Date();
@@ -113,21 +78,20 @@ class Share {
             message: message,
             requireInteraction: requireInteraction
         }, function(response) {
-            logger.debug("showNotify Response: ", response);
+            console.log("showNotify Response: ", response);
         });
 
     }
 
-    static saveStorage(jsonValue) {
+    /*static saveStorage(jsonValue) {
         chrome.storage.local.set(jsonValue, function () {
-            //logger.debug(JSON.stringify(jsonValue));
             console.log('config updated : ' + JSON.stringify(jsonValue));
         });
     }
 
     static getStorage(item, callback) {
         chrome.storage.local.get(item, callback);
-    }
+    }*/
 
 // chrome.storage.sync에 저장된 정보를 promise로 가져온다.
    /* static promiseStorageSync(syncStorageId, userConfigId) {
@@ -174,6 +138,12 @@ class Share {
         }
     }*/
 
+    static uuid() {
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+            var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+            return v.toString(16);
+        });
+    }
 }
 
 export default Share;
