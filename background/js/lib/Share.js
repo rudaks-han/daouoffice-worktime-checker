@@ -60,13 +60,13 @@ class Share {
         return date;
     }
 
-    static addHours(date, day) {
-        date.setTime(date.getTime() + day * 60 * 60 * 1000);
+    static addHours(date, hours) {
+        date.setTime(date.getTime() + hours * 60 * 60 * 1000);
         return date;
     }
 
-    static addMinutes(date, day) {
-        date.setTime(date.getTime() + day * 60 * 1000);
+    static addMinutes(date, minutes) {
+        date.setTime(date.getTime() + minutes * 60 * 1000);
         return date;
     }
 

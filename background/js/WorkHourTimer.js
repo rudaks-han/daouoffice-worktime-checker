@@ -1,5 +1,6 @@
 import DaouofficeClient from "./DaouofficeClient.js";
 import WorkHourChecker  from "./WorkHourChecker.js";
+import Share from "./lib/Share.js";
 
 const daouofficeClient = new DaouofficeClient();
 const workHourChecker = new WorkHourChecker();
@@ -33,13 +34,12 @@ export default class WorkHourTimer {
 		}, this.intervalTime);
 
 		//_this.checkUserSession();
-		_this.checkCalendar();
-		//_this.checkWorkHour();
+		await _this.checkCalendar();
+		await _this.checkWorkHour();
 	}
 
-	isUseFlag = async () => {
-		const userConfig = await daouofficeClient.getUserConfig();
-		return userConfig.useFlag;
+	getUserConfig = async () => {
+		return await daouofficeClient.getUserConfig();
 	}
 
 	checkUserSession = async () => {
@@ -49,13 +49,11 @@ export default class WorkHourTimer {
 
 	checkCalendar = async () => {
 		const response = await daouofficeClient.getCalendar();
-
 		this.parseCalendar(response);
 	}
 
 	parseCalendar = (response) => {
 		const list = response.data.list;
-		//console.log(list)
 		list.forEach(item => {
 			const datetime = item.datetime;
 			const eventList = item.eventList;
@@ -65,85 +63,59 @@ export default class WorkHourTimer {
 				let type = event.type; // holiday: 휴일, company: 연차/공가)
 				let summary = event.summary; // 연차 : 서형태, 반차: 이승엽(오후), 공가 : 유민(오후)
 
-				if (type === 'holiday' || type === 'anniversary') { // anniversary : 근로자의 날
-					//holidayList[date] = type;
+				if (this.isHoliday(type)) {
 					this.holidayList[date] = type;
-				}
-				else if (type === 'company' || summary.indexOf('보상휴가') > -1) { // 보상휴가는 type=normal
+				} else if (this.isDayOff(type, summary)) {
 					if (!this.dayOffList[date])
 						this.dayOffList[date] = [];
 
 					this.dayOffList[date].push(summary); // summary => 연차 : 한경만
 				}
 			})
+		});
 
-			/*if (eventList.length > 0) {
-				for (let j = 0; j < eventList.length; j++) {
-					let type = eventList[j].type; // holiday: 휴일, company: 연차/공가)
-					let summary = eventList[j].summary; // 연차 : 서형태, 반차: 이승엽(오후), 공가 : 유민(오후)
-
-					//console.error('date : ' + date + ', type : ' + type + ', summary : ' + summary);
-
-					if (type == 'holiday' || type == 'anniversary') // anniversary : 근로자의 날
-					{
-						holidayList[date] = type;
-					}
-					else if (type == 'company' || summary.indexOf('보상휴가') > -1) // 보상휴가는 type=normal
-					{
-						if (!dayOffList[date])
-							dayOffList[date] = [];
-
-						dayOffList[date].push(summary); // summary => 연차 : 한경만
-					}
-
-				}
-			}*/
-		})
-
-		console.log('this.holidayList')
-		console.log(this.holidayList)
 		console.log('this.dayOffList')
 		console.log(this.dayOffList)
-		/*for (let i = 0; i < list.length; i++) {
-			let datetime = list[i].datetime;
-			let eventList = list[i].eventList;
-
-			let date = datetime.substring(0, 10);
-
-			if (eventList.length > 0) {
-				for (let j = 0; j < eventList.length; j++) {
-					let type = eventList[j].type; // holiday: 휴일, company: 연차/공가)
-					let summary = eventList[j].summary; // 연차 : 서형태, 반차: 이승엽(오후), 공가 : 유민(오후)
-
-					//console.error('date : ' + date + ', type : ' + type + ', summary : ' + summary);
-
-					if (type == 'holiday' || type == 'anniversary') // anniversary : 근로자의 날
-					{
-						holidayList[date] = type;
-					}
-					else if (type == 'company' || summary.indexOf('보상휴가') > -1) // 보상휴가는 type=normal
-					{
-						if (!dayOffList[date])
-							dayOffList[date] = [];
-
-						dayOffList[date].push(summary); // summary => 연차 : 한경만
-					}
-
-				}
-			}
-		}*/
 	}
 
+	isHoliday = type => {
+		return type === 'holiday' || type === 'anniversary';
+	}
 
+	isDayOff = (type, summary) => {
+		return type === 'company'
+			&& (
+				summary.indexOf('휴가') > -1
+				|| summary.indexOf('연차') > -1
+				|| summary.indexOf('공가') > -1
+				|| summary.indexOf('위로') > -1
+				|| summary.indexOf('반차') > -1
+			);
+	}
 
 	checkWorkHour = async () => {
 		console.log('checkWorkHour')
-		const useFlag = await this.isUseFlag();
-		if (useFlag != 'Y') {
+		const userConfig = await this.getUserConfig();
+		if (!userConfig && userConfig.useFlag != 'Y') {
 			console.log('>>> 출퇴근 체크가 사용하지 않음으로 설정되어 있습니다.');
 			return;
 		}
 
-		workHourChecker.check();
+		console.log('__userConfig')
+		console.log(userConfig)
+
+		const username = userConfig.sessionUserName;
+		const currDate = Share.getCurrDate();
+		/*const username = '백명구';
+		const currDate = '2022-05-06';*/
+
+		const params = {
+			username,
+			currDate,
+			userConfig,
+			holidayList: this.holidayList,
+			dayOffList: this.dayOffList
+		}
+		workHourChecker.check(params);
 	}
 }

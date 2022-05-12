@@ -38,23 +38,6 @@ const requestFn = async (request) => {
 
 chrome.runtime.onMessage.addListener(receiveMessage);
 
-function initialize() {
-    /*firebaseConfigTimer = setInterval(() => {
-        firebaseConfigChecker.get(userInfo.username)
-    }, firebaseConfigCheckerInterval); // 세션정보 5분마다 가져온다.
-
-    // 사용여부 체크
-    getChromeStorageSync('use-flag', (items) => {
-        let useFlag = items['use-flag'];
-
-        if (useFlag !== 'Y')
-        {
-            logger.info('>>> 출퇴근 체크가 사용하지 않음으로 설정되어 있습니다.');
-        }
-
-        check();
-    });*/
-}
 
 const workHourTimer = new WorkHourTimer();
 workHourTimer.start();
