@@ -1,26 +1,32 @@
 {
-  "name": "그룹웨어 출퇴근 체크",
-  "version": "1.0.30",
+  "name": "그룹웨어 출퇴근 체크 v3",
+  "version": "1.1.0",
   "description": "그룹웨어(다우오피스) 출퇴근 시간을 기록하는 기능을 제공합니다. 출근시간 및 퇴근시간을 설정해 놓으면 해당 시간에 일일히 클릭하지 않고 자동으로 체크함으로써 편리함을 느낄 수 있습니다.",
-  "browser_action": {
-    "default_icon": "images/icon.png",
-    "default_popup": "popup.html"
-  },
-  "icons": {
-    "16": "images/icon-16.png",
-    "48": "images/icon-48.png",
-    "128": "images/icon-128.png"
+  "action": {
+    "default_icons": {
+      "16": "images/icon-16.png",
+      "48": "images/icon-48.png",
+      "128": "images/icon-128.png"
+    },
+    "default_popup": "popup/popup.html"
   },
   "background": {
-    "page" : "background.html"
+    "service_worker": "background/background.js",
+    "type": "module"
   },
-  "permissions" : [
-    "https://spectra.daouoffice.com/api/*",
+  "permissions": [
     "notifications",
     "background",
     "storage",
     "cookies"
   ],
-  "content_security_policy":"script-src 'self' https://www.gstatic.com/ https://*.firebaseio.com https://www.googleapis.com; object-src 'self'",
-  "manifest_version" : 2
+  "host_permissions": [
+    "https://spectra.daouoffice.com/api/*"
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'",
+    "sandbox": "sandbox allow-scripts; script-src 'self' 'https://www.gstatic.com/' 'https://*.firebaseio.com' 'https://www.googleapis.com'; object-src 'self'"
+
+  },
+  "manifest_version" : 3
 }
