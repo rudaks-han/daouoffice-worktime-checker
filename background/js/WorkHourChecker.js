@@ -84,7 +84,7 @@ export default class WorkHourChecker {
 
 	isMarkedClockInAlready = async () => {
 		console.log('[출근도장 표시되었는지 체크]')
-		const clockInDate = await StorageUtil.get('clockInDate')
+		const clockInDate = await StorageUtil.get('clockInDateStorageKey')
 
 		if (clockInDate === Share.getCurrDate()) {
 			console.log('>>> 이미 출근도장이 찍혀져 있습니다.')
@@ -96,7 +96,7 @@ export default class WorkHourChecker {
 
 	isMarkedClockOutAlready = async () => {
 		console.log('[퇴근도장 표시되었는지 체크]')
-		const clockOutDate = await StorageUtil.get('clockOutDate')
+		const clockOutDate = await StorageUtil.get('clockOutDateStorageKey')
 
 		if (clockOutDate === Share.getCurrDate()) {
 			console.log('>>> 이미 퇴근도장이 찍혀져 있습니다.')
@@ -107,7 +107,8 @@ export default class WorkHourChecker {
 	}
 
 	markAsClockIn = async params => {
-		const { userConfig, currDate, dayOffList, username } = params;
+		const { userConfig, currDate, dayOffList, username, now, userSession } = params;
+		const userId = userSession.data.id;
 		const {
 			clockInBeforeMinute,
 			clockInCheckType,
@@ -116,11 +117,11 @@ export default class WorkHourChecker {
 			clockInRandomFromMinute,
 			clockInRandomToMinute
 		} = userConfig;
-		const startWorkTimeDate = this.toCurrDate(clockInHour, clockInMinute);
+		const startWorkTimeDate = this.getCurrentDateWithTime(currDate, clockInHour, clockInMinute, 0);
 
 		if (clockInCheckType === 'TIME') {
-			if (this.isInRangeClockIn(startWorkTimeDate, parseInt(clockInBeforeMinute), currDate, dayOffList, username)) {
-				this.requestClockIn();
+			if (this.isInRangeClockIn(startWorkTimeDate, parseInt(clockInBeforeMinute), currDate, now, dayOffList, username)) {
+				await this.requestClockIn(userId, username);
 			}
 		} else if (clockInCheckType === 'RANDOM') {
 			let randomMinuteStorageValue = await StorageUtil.get('beforeRandomMinute')
@@ -139,14 +140,15 @@ export default class WorkHourChecker {
 				beforeMinute = randomMinuteStorageValue[currDate];
 			}
 
-			if (this.isInRangeClockIn(startWorkTimeDate, parseInt(beforeMinute), currDate, dayOffList, username)) {
-				this.requestClockIn();
+			if (this.isInRangeClockIn(startWorkTimeDate, parseInt(beforeMinute), currDate, now, dayOffList, username)) {
+				await this.requestClockIn(userId, username);
 			}
 		}
 	}
 
 	markAsClockOut = async params => {
-		const { userConfig, currDate, dayOffList, username } = params;
+		const { userConfig, currDate, dayOffList, username, now, userSession } = params;
+		const userId = userSession.data.id;
 		const {
 			clockOutBeforeMinute,
 			clockOutCheckType,
@@ -156,11 +158,11 @@ export default class WorkHourChecker {
 			clockOutRandomToMinute
 		} = userConfig;
 
-		const endWorkTimeDate = this.toCurrDate(clockOutHour, clockOutMinute);
+		const endWorkTimeDate = this.getCurrentDateWithTime(currDate, clockOutHour, clockOutMinute, 0);
 
 		if (clockOutCheckType === 'TIME') {
-			if (this.isInRangeClockOut(endWorkTimeDate, parseInt(clockOutBeforeMinute), currDate, dayOffList, username)) {
-				this.requestClockOut();
+			if (this.isInRangeClockOut(endWorkTimeDate, parseInt(clockOutBeforeMinute), currDate, now, dayOffList, username)) {
+				this.requestClockOut(params);
 			}
 		} else if (clockOutCheckType === 'RANDOM') {
 			let randomMinuteStorageValue = await StorageUtil.get('afterRandomMinute')
@@ -179,27 +181,25 @@ export default class WorkHourChecker {
 				afterMinute = randomMinuteStorageValue[currDate];
 			}
 
-			if (this.isInRangeClockOut(endWorkTimeDate, parseInt(afterMinute), currDate, dayOffList, username)) {
-				this.requestClockOut();
+			if (this.isInRangeClockOut(endWorkTimeDate, parseInt(afterMinute), currDate, now, dayOffList, username)) {
+				this.requestClockOut(params);
 			}
 		}
 	}
 
-	toCurrDate = (hour, minute) => {
-		return this.getCurrentDateWithTime(hour, minute, 0);
+
+	getCurrentDateWithTime = (currDate, hour, minute, second) => {
+		const arrDate = currDate.split('-');
+		const year = parseInt(arrDate[0]);
+		const month = parseInt(arrDate[1]) - 1;
+		const day = parseInt(arrDate[2]);
+		return new Date(year, month, day, hour, minute, second);
 	}
 
-	getCurrentDateWithTime = (hour, minute, second) => {
-		const date = new Date();
-		return new Date(date.getFullYear(), date.getMonth(), date.getDate(), hour, minute, second);
-	}
+	isInRangeClockIn = (startWorkTimeDate, minuteBeforeClockIn, currDate, now, dayOffList, username) => {
+		//console.log('[출근도장 범위내 여부 체크]')
 
-	isInRangeClockIn = (startWorkTimeDate, minuteBeforeClockIn, currDate, dayOffList, username) => {
-		console.log('[출근도장 범위내 여부 체크]')
-
-		const date = new Date();
 		let clockInMarkingTime;
-
 		// 반차일 경우 시간 조정
 		let userDayHalfOff = this.isUserDayHalfOff(currDate, dayOffList, username);
 		if (userDayHalfOff === '오전반반차') {
@@ -219,13 +219,13 @@ export default class WorkHourChecker {
 			clockInMarkingTime = Share.addMinutes(startWorkTimeDate, -minuteBeforeClockIn); // 기준시간 07:55
 		}
 
-		let validTime = Share.addMinutes(startWorkTimeDate, 60); // 기준시간 09:00
-
-		if (date >= clockInMarkingTime) {
-			if (date > validTime) {
+		if (now >= clockInMarkingTime) {
+			let validTime = Share.addMinutes(startWorkTimeDate, 60); // 기준시간 09:00
+			if (now > validTime) {
 				console.log('>>> 출근도장 찍을 유효시간(1시간) 초과됨');
 				return false;
 			} else {
+				console.log('>>> 출근도장 찍을 시간');
 				return true;
 			}
 		} else {
@@ -235,11 +235,9 @@ export default class WorkHourChecker {
 	}
 
 	// 퇴근시간 후 5분후 부터 1시간 까지
-	isInRangeClockOut = (endWorkTimeDate, minuteAfterClockOut, currDate, dayOffList, username) => {
-		console.log('[퇴근도장 범위내 여부 체크]')
+	isInRangeClockOut = (endWorkTimeDate, minuteAfterClockOut, currDate, now, dayOffList, username) => {
+		//console.log('[퇴근도장 범위내 여부 체크]')
 
-		const date = new Date();
-		// 퇴근도장 찍을 시간
 		let clockOutMarkingTime;
 
 		// 반차일 경우 시간 조정
@@ -259,12 +257,13 @@ export default class WorkHourChecker {
 			clockOutMarkingTime = Share.addMinutes(endWorkTimeDate, minuteAfterClockOut);
 		}
 
-		let outTime = Share.addMinutes(endWorkTimeDate, 60); // 기준시간 18:00 (17:00 + 01:00)
-		if (date >= clockOutMarkingTime) {
-			if (date > outTime) {
+		if (now >= clockOutMarkingTime) {
+			let validTime = Share.addMinutes(endWorkTimeDate, 60); // 기준시간 18:00 (17:00 + 01:00)
+			if (now > validTime) {
 				console.log('>>> 퇴근도장 찍을 유효시간(1시간) 초과됨');
 				return false
 			} else {
+				console.log('>>> 퇴근도장 찍을 시간');
 				return true;
 			}
 		} else {
@@ -298,11 +297,33 @@ export default class WorkHourChecker {
 		return '';
 	}
 
-	requestClockIn = () => {
-		console.error('requestClockIn()')
+	requestClockIn = async (userId, username) => {
+		const response = await daouofficeClient.requestClockIn(userId);
+		const { code, message, name } = response;
+		const currDate = Share.getCurrDate();
+		const currTime = Share.getCurrTime();
+
+		if (code === '200') {
+			const msg = `${username}님, ${currDate} ${currTime}에 출근시간으로 표시되었습니다.`;
+			await StorageUtil.set({
+				clockInDateStorageKey: currDate
+			});
+			Share.showNotify('출근도장', msg, true);
+		} else {
+			if (name === 'timeline.clockin.duplication') { // 출근이 중복하여 존재합니다.
+				Share.showNotify('출근도장', message, true);
+				await StorageUtil.set({
+					clockInDateStorageKey: currDate
+				});
+			} else {
+				console.error(response);
+			}
+		}
 	}
 
-	requestClockOut = () => {
-		console.error('requestClockOut()')
+	requestClockOut = async userId => {
+		/*const response = await daouofficeClient.requestClockOut(userId);
+		console.error('requestClockIn response');
+		console.error(response);*/
 	}
 }

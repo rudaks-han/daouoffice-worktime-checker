@@ -71,15 +71,30 @@ class Share {
     }
 
     static showNotify(title, message, requireInteraction = false) {
+        if (Notification && Notification.permission !== "granted") {
+            Notification.requestPermission(function (status) {
+                if (Notification.permission !== status) {
+                    Notification.permission = status;
+                }
+            });
+        }
+        if (Notification && Notification.permission === "granted") {
+            let start = Date.now();
+            let id = new Date().getTime() + '';
+            let options = {
+                type: 'basic',
+                iconUrl: '/images/icon.png',
+                title: title,
+                message: message,
+                requireInteraction: requireInteraction
+            };
 
-        chrome.runtime.sendMessage({
-            action: "notification",
-            title: title,
-            message: message,
-            requireInteraction: requireInteraction
-        }, function(response) {
-            console.log("showNotify Response: ", response);
-        });
+            chrome.notifications.create(options);
+
+            chrome.notifications.onClicked.addListener(function(notificationId, byUser) {
+                chrome.notifications.clear(notificationId, function() {});
+            });
+        }
 
     }
 

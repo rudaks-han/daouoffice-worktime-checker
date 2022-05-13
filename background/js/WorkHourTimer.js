@@ -13,6 +13,7 @@ export default class WorkHourTimer {
 		this.intervalTime = 60 * 1000;
 		this.holidayList = {};
 		this.dayOffList = {};
+		this.userSession = {};
 	}
 
 
@@ -33,7 +34,7 @@ export default class WorkHourTimer {
 			_this.checkWorkHour();
 		}, this.intervalTime);
 
-		//_this.checkUserSession();
+		_this.checkUserSession();
 		await _this.checkCalendar();
 		await _this.checkWorkHour();
 	}
@@ -44,7 +45,8 @@ export default class WorkHourTimer {
 
 	checkUserSession = async () => {
 		console.log('checkUserSession')
-		await daouofficeClient.getSession();
+		const userSession = await daouofficeClient.getSession();
+		this.userSession = userSession;
 	}
 
 	checkCalendar = async () => {
@@ -106,16 +108,24 @@ export default class WorkHourTimer {
 
 		const username = userConfig.sessionUserName;
 		const currDate = Share.getCurrDate();
+		//const now = new Date();
 		/*const username = '백명구';
 		const currDate = '2022-05-06';*/
+		const now = new Date('2022-05-13T06:55:00');
+
+		console.log('now')
+		console.log(now)
 
 		const params = {
 			username,
 			currDate,
 			userConfig,
+			userSession: this.userSession,
 			holidayList: this.holidayList,
-			dayOffList: this.dayOffList
+			dayOffList: this.dayOffList,
+			now
 		}
-		workHourChecker.check(params);
+
+		await workHourChecker.check(params);
 	}
 }
