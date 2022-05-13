@@ -111,8 +111,6 @@ export default class DaouofficeClient {
 
 	async clockIn() {
 		const response = await this.getSession();
-		console.error(response);
-
 		if (response && response.data && response.data.id) {
 			const userSession = response.data;
 			const userId = userSession.id;
@@ -139,8 +137,6 @@ export default class DaouofficeClient {
 
 	async clockOut() {
 		const response = await this.getSession();
-		console.error(response);
-
 		if (response && response.data && response.data.id) {
 			const userSession = response.data;
 			const userId = userSession.id;

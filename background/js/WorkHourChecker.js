@@ -311,7 +311,7 @@ export default class WorkHourChecker {
 	}
 
 	requestClockIn = async (userId, username) => {
-		console.error('__ requestClockIn');
+		this.printLog(' ======> requestClockIn');
 		if (true) return;
 		const response = await daouofficeClient.requestClockIn(userId);
 		const { code, message, name } = response;
@@ -337,7 +337,7 @@ export default class WorkHourChecker {
 	}
 
 	requestClockOut = async (userId, username) => {
-		console.error('__ requestClockOut');
+		this.printLog(' ======> requestClockOut');
 		if (true) return;
 		const response = await daouofficeClient.requestClockOut(userId);
 		const { code, message, name } = response;
