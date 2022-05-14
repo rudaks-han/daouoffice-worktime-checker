@@ -1,5 +1,9 @@
 import {initializeApp} from "./firebase/firebase-app.js";
-import {getDatabase, onDisconnect, onValue, set, ref, update, getConnectStatus} from "./firebase/firebase-database.js";
+import {get, getConnectStatus, getDatabase, onValue, ref, set} from "./firebase/firebase-database.js";
+import DaouofficeClient from "./DaouofficeClient.js";
+import Share from "./lib/Share.js";
+
+const daouofficeClient = new DaouofficeClient();
 
 class FirebaseApp {
 	_firebase;
@@ -12,23 +16,11 @@ class FirebaseApp {
 		this.firebaseEventAttached = false;
 		this.initialize();
 		this.checkNetworkConnection();
-		this.networkConnected = false;
 	}
 
-	/*init()
-	{
-		const config = {
-			apiKey: "AIzaSyBeWHyVqAAk-kXXPtsEg-4IK66P9Xjma4A",
-			authDomain: "spectra-groupware.firebaseapp.com",
-			databaseURL: "https://spectra-groupware.firebaseio.com",
-			projectId: "spectra-groupware",
-			storageBucket: "spectra-groupware.appspot.com",
-			messagingSenderId: "785900078227"
-		};
-		//this._firebase = firebase.initializeApp(config);
-		this.app = initializeApp(firebaseConfig);
-		this.db = getDatabase();
-	}*/
+	printLog(str) {
+		console.log(`[firebase] ${str}`);
+	}
 
 	checkNetworkConnection() {
 		const _this = this;
@@ -74,60 +66,77 @@ class FirebaseApp {
 
 	firebaseConnectTest = () => {
 		const _this = this;
-		const buildRef = ref(this.db, `build-status/dummy`);
+		const buildRef = ref(this.db, `build-status`);
 		onValue(buildRef, (snapshot) => {
-			console.log('dummy test callback');
+			_this.printLog('dummy test callback');
 		});
 	}
 
 	addEvent = async (db) => {
-		const _this = this;
 		if (!this.firebaseEventAttached) {
-			const accessLogRef = ref(db, `access_logs`);
-			onValue(accessLogRef, (snapshot) => {
-				console.log('firebaseEvent attached');
-			}, {
-				onlyOnce: true
-			});
+			this.addEventUserConfigChanged(db);
 		}
 
 		this.firebaseEventAttached = true;
 	}
 
-	//writeLog(date, user, key, value)
-	set(key, value)
-	{
-		logger.trace('firebase set');
-		logger.trace('key: ' + key);
-		logger.trace('value: ' + value);
-
-		/*this._firebase.database().ref(key).set({
-			value
-		});*/
-
-		const db = this.db;
-		set(ref(db, key), value);
+	addEventUserConfigChanged = (db) => {
+		const userConfigRef = ref(db, `user_config`);
+		onValue(userConfigRef, this.userConfigChangedCallback, {
+		});
 	}
 
-	async get(key)
-	{
-		/*let ref = this._firebase.database().ref(key);
-		ref.on('value', function(snapshot) {
-			callback(snapshot);
-		});*/
+	userConfigChangedCallback = async (snapshot) => {
+		const userConfig = await daouofficeClient.getUserConfig();
+		const {username} = userConfig; // 2014001
+
+		const userConfigValues = snapshot.val();
+		if (userConfigValues[username]) {
+			const userConfigValue = userConfigValues[username].value;
+			const useFlag = userConfigValue['use-flag']
+			userConfig['useFlag'] = useFlag;
+			await daouofficeClient.saveUserConfig({
+				data: userConfig
+			})
+
+			this.printLog('userConfigChangedCallback');
+			this.printLog(`[${username}] useFlag changed: ${useFlag}`);
+		}
+	}
+
+	setUserConfig = async params => {
+		const { username, value } = params;
+		// username : 2014001
+		const db = this.db;
+		await set(ref(db, 'user_config/' + username + '/value'), value);
+	}
+
+	getUserConfig = async params => {
+		const { username } = params;
+		// username : 2014001
 
 		const db = this.db;
-		const valueRef = ref(db, key);
-		const snapshot = await get(valueRef);
+		const userConfigRef = ref(db, `user_config/` + username + '/value');
+		const snapshot = await get(userConfigRef);
 		return snapshot.val();
 	}
 
-	/*log(itemId, value)
-	{
-		const key = `${this.api_log}/${getCurrDate()}/${itemId}/${getCurrTime()}`;
+	addWorktimeLog = async params => {
+		const { username, type } = params;
+		const db = this.db;
 
-		this.set(key, value);
-	}*/
+		let currTime = getCurrTime();
+		const key = `worktime_checker/${Share.getCurrDateToMonth()}/${Share.getCurrDay()}/${username}/${type}`;
+
+		await set(ref(db, key), currTime);
+	}
+
+	//writeLog(date, user, key, value)
+	set(key, value)
+	{
+		const db = this.db;
+		set(ref(db, key), value);
+	}
 
 	accessLog = (path, value) => {
 		const db = this.db;

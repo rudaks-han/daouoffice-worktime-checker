@@ -9,7 +9,8 @@ function init() {
 		const userInfo = response || {} ;
 		let username = userInfo.username || '';
 		if (username) {
-			onUpdateFirebaseConfig(username);
+			//onUpdateFirebaseConfig(username);
+			getFirebaseUserConfig(username);
 		}
 
 		let useFlag = userInfo.useFlag;
@@ -31,6 +32,29 @@ function init() {
 	});
 }
 
+function getFirebaseUserConfig(username) {
+	ChromeRuntime.sendMessage({
+		action: 'firebaseApp.getUserConfig',
+		params: {
+			username
+		}
+	}, response => {
+		const useFlag = response['use-flag'];
+
+		if (useFlag == 'Y') {
+			setUseFlagChecked(true);
+		} else {
+			setUseFlagChecked(false);
+		}
+
+		if (useFlag == 'N') {
+			disableUserSetting(true);
+		} else if (useFlag == 'Y') {
+			disableUserSetting(false);
+		}
+	});
+}
+
 function setInputValue(response) {
 	const username = response.username || '';
 	const password = response.password || '';
@@ -47,7 +71,6 @@ function setInputValue(response) {
 	const clockOutRandomFromMinute = response.clockOutRandomFromMinute || '5';
 	const clockOutRandomToMinute = response.clockOutRandomToMinute || '10';
 
-	console.log('clockInHour : ' + clockInHour)
 	$('#username').val(username);
 	$('#password').val(password);
 	$('#clock-in-hour').val(clockInHour);
@@ -79,14 +102,12 @@ function getOptionTime(toMinute, suffix) {
 	return str;
 }
 
-function disableUserSetting(flag)
-{
+function disableUserSetting(flag) {
 	$('[id^="clock-"]').prop('disabled', flag);
 	$('input[name^="clock-"]').prop('disabled', flag);
 }
 
-function checkUsernameAndPassword()
-{
+function checkUsernameAndPassword() {
 	let username = $('#username').val();
 	let password = $('#password').val();
 
@@ -112,39 +133,12 @@ function checkUsernameAndPassword()
 	});
 }
 
-function reset()
-{
+function reset() {
 	ChromeRuntime.sendMessage({
 		action: 'daouofficeClient.clearAllStorage'
 	}, response => {
 		location.reload();
 	});
-}
-
-function onUpdateFirebaseConfig(username) {
-	/*const firebaseKey = firebaseApp.user_config + '/' + username;
-	firebaseApp.get(firebaseApp.user_config + '/' + username, snapshot => {
-
-		if (snapshot.val() == null)
-		{
-			return;
-		}
-
-		let {value} = snapshot.val();
-
-		const jsonValue = {
-			'use-flag': value['use-flag']
-		};
-		chrome.storage.sync.set(jsonValue, function () {
-			//logger.debug(JSON.stringify(jsonValue));
-			console.log('config updated : ' + JSON.stringify(jsonValue));
-
-			if (value['use-flag'] == 'Y')
-				setUseFlagChecked(true);
-			else
-				setUseFlagChecked(false);
-		});
-	});*/
 }
 
 function saveConfig() {
@@ -165,16 +159,14 @@ function saveConfig() {
 	const clockOutRandomFromMinute = $('#clock-out-random-from-minute').val();
 	const clockOutRandomToMinute = $('#clock-out-random-to-minute').val();
 
-	if (parseInt(clockInRandomFromMinute) < parseInt(clockInRandomToMinute))
-	{
+	if (parseInt(clockInRandomFromMinute) < parseInt(clockInRandomToMinute)) {
 		alert('시작시간이 종료시간 보다 이전이어야 합니다.');
 		$('#clock-in-random-from-minute').focus();
 		//$('#clock-in-random-from-minute').val(clockInRandomToMinute);
 		return;
 	}
 
-	if (parseInt(clockOutRandomFromMinute) > parseInt(clockOutRandomToMinute))
-	{
+	if (parseInt(clockOutRandomFromMinute) > parseInt(clockOutRandomToMinute)) {
 		alert('종료시간이 시작시간 보다 이전이어야 합니다.');
 		$('#clock-out-random-from-minute').focus();
 		//$('#clock-in-random-from-minute').val(clockOutRandomToMinute);
@@ -215,11 +207,17 @@ function saveConfig() {
 			data: jsonValue
 		}
 	}, response => {
-		/*const firebaseKey = firebaseApp.user_config + '/' + username;
-		const firebaseValue = {'use-flag' : useFlag};
+		jsonValue['use-flag'] = jsonValue['useFlag']; // 이전버전 호환성 유지
 		delete jsonValue['password'];
+		delete jsonValue['useFlag'];
 
-		firebaseApp.set(firebaseKey, jsonValue);*/
+		ChromeRuntime.sendMessage({
+			action: 'firebaseApp.setUserConfig',
+			params: {
+				username,
+				value: jsonValue
+			}
+		}, {});
 
 		alert('설정정보가 저장되었습니다.');
 	});

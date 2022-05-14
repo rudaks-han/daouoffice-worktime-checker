@@ -1,7 +1,4 @@
-import HttpRequest from './httpRequest.js';
-
 class Share {
-
 
     static getCurrDate() {
         var currDate = new Date();
@@ -36,14 +33,17 @@ class Share {
         return currDate.getFullYear();
     }
 
-    static getCurrMonth()
-    {
+    static getCurrMonth() {
         var currDate = new Date();
         var month = currDate.getMonth() + 1;
         if (month < 10)
             month = '0' + month;
 
         return month;
+    }
+
+    static getCurrDateToMonth() {
+        return getCurrYear() + '-' + getCurrMonth();
     }
 
     static getCurrDay() {
@@ -98,60 +98,11 @@ class Share {
 
     }
 
-    /*static saveStorage(jsonValue) {
-        chrome.storage.local.set(jsonValue, function () {
-            console.log('config updated : ' + JSON.stringify(jsonValue));
-        });
-    }
-
-    static getStorage(item, callback) {
-        chrome.storage.local.get(item, callback);
-    }*/
-
-// chrome.storage.sync에 저장된 정보를 promise로 가져온다.
-   /* static promiseStorageSync(syncStorageId, userConfigId) {
-        return new Promise(function(resolve, reject) {
-            chrome.storage.sync.get(syncStorageId, function(items) {
-                syncStorage[syncStorageId] = items[syncStorageId];
-                if (userConfigId) userConfig[userConfigId] = items[syncStorageId];
-
-                resolve('success')
-            });
-        })
-    }*/
-
     static randomRange(n1, n2) {
         n1 = parseInt(n1);
         n2 = parseInt(n2);
         return Math.floor( (Math.random() * (n2 - n1 + 1)) + n1 );
     }
-/*
-    static getChromeStorageSync(item, callback) {
-        chrome.storage.sync.get(item, callback);
-    }*/
-
-    /*static setCookie(cookie_name, value, days) {
-        var exdate = new Date();
-        exdate.setDate(exdate.getDate() + days);
-        // 설정 일수만큼 현재시간에 만료값으로 지정
-
-        var cookie_value = escape(value) + ((days == null) ? '' : ';    expires=' + exdate.toUTCString());
-        document.cookie = cookie_name + '=' + cookie_value;
-    }
-
-    static getCookie(cookie_name) {
-        var x, y;
-        var val = document.cookie.split(';');
-
-        for (var i = 0; i < val.length; i++) {
-            x = val[i].substr(0, val[i].indexOf('='));
-            y = val[i].substr(val[i].indexOf('=') + 1);
-            x = x.replace(/^\s+|\s+$/g, ''); // 앞과 뒤의 공백 제거하기
-            if (x == cookie_name) {
-                return unescape(y); // unescape로 디코딩 후 값 리턴
-            }
-        }
-    }*/
 
     static uuid() {
         return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {

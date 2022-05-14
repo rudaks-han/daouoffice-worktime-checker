@@ -1,5 +1,6 @@
 import DaouofficeClient from "./js/DaouofficeClient.js";
 import WorkHourTimer from "./js/WorkHourTimer.js";
+import FirebaseApp from "./js/FirebaseApp.js";
 
 const receiveMessage = (request, sender, sendResponse) => {
     requestFn(request)
@@ -14,6 +15,7 @@ const receiveMessage = (request, sender, sendResponse) => {
 
 const clientModule = {};
 clientModule['daouofficeClient'] = new DaouofficeClient();
+clientModule['firebaseApp'] = new FirebaseApp();
 
 const requestFn = async (request) => {
     const requestArr = request.action.split('.');
@@ -38,5 +40,8 @@ chrome.runtime.onMessage.addListener(receiveMessage);
 
 const workHourTimer = new WorkHourTimer();
 workHourTimer.start();
+
+const firebaseApp = new FirebaseApp();
+firebaseApp.start();
 
 

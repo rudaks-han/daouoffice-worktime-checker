@@ -323,6 +323,10 @@ export default class WorkHourChecker {
 			await StorageUtil.set({
 				clockInDateStorageKey: currDate
 			});
+			await firebaseApp.addWorktimeLog({
+				username,
+				type: '출근시간'
+			});
 			Share.showNotify('출근도장', msg, true);
 		} else {
 			if (name === 'timeline.clockin.duplication') { // 출근이 중복하여 존재합니다.
@@ -348,6 +352,10 @@ export default class WorkHourChecker {
 			const msg = `${username}님, ${currDate} ${currTime}에 퇴근시간으로 표시되었습니다.`;
 			await StorageUtil.set({
 				clockOutDateStorageKey: currDate
+			});근
+			await firebaseApp.addWorktimeLog({
+				username,
+				type: '퇴시간'
 			});
 			Share.showNotify('퇴근도장', msg, true);
 		} else {

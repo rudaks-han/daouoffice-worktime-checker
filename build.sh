@@ -1,2 +1,2 @@
 
-zip install.zip css/* images/* js/* manifest.json *.html *.js
+zip install.zip background/* css/* images/* option/* share/* manifest.json
