@@ -1,8 +1,10 @@
 import DaouofficeClient from "./DaouofficeClient.js";
 import Share from "./lib/Share.js";
 import StorageUtil from "./lib/storageUtil.js";
+import FirebaseApp from "./FirebaseApp.js";
 
 const daouofficeClient = new DaouofficeClient();
+const firebaseApp = new FirebaseApp();
 
 export default class WorkHourChecker {
 
@@ -312,7 +314,6 @@ export default class WorkHourChecker {
 
 	requestClockIn = async (userId, username) => {
 		this.printLog(' ======> requestClockIn');
-		if (true) return;
 		const response = await daouofficeClient.requestClockIn(userId);
 		const { code, message, name } = response;
 		const currDate = Share.getCurrDate();
@@ -342,7 +343,6 @@ export default class WorkHourChecker {
 
 	requestClockOut = async (userId, username) => {
 		this.printLog(' ======> requestClockOut');
-		if (true) return;
 		const response = await daouofficeClient.requestClockOut(userId);
 		const { code, message, name } = response;
 		const currDate = Share.getCurrDate();
