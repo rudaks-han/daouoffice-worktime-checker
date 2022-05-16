@@ -1,2 +1,2 @@
 
-zip install.zip background/* css/* images/* option/* share/* manifest.json
+zip -r install.zip background css images option share manifest.json

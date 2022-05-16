@@ -1,7 +1,7 @@
 {
   "name": "그룹웨어 출퇴근 체크 v3",
   "version": "0.0.1",
-  "description": "그룹웨어(다우오피스) 출퇴근 시간을 기록하는 기능을 제공합니다. 출근시간 및 퇴근시간을 설정해 놓으면 해당 시간에 일일히 클릭하지 않고 자동으로 체크함으로써 편리함을 느낄 수 있습니다.",
+  "description": "그룹웨어(다우오피스) 출퇴근 시간을 기록하는 기능을 제공합니다. 출근시간 및 퇴근시간을 설정해 놓으면 해당 시간에 자동으로 체크함으로써 편리함을 느낄 수 있습니다.",
   "action": {
     "default_icon": "images/icon-128.png",
     "default_popup": "popup/popup.html"
@@ -13,8 +13,7 @@
   "permissions": [
     "notifications",
     "background",
-    "storage",
-    "cookies"
+    "storage"
   ],
   "host_permissions": [
     "https://spectra.daouoffice.com/api/*"
@@ -22,7 +21,6 @@
   "content_security_policy": {
     "extension_pages": "script-src 'self'; object-src 'self'",
     "sandbox": "sandbox allow-scripts; script-src 'self' 'https://www.gstatic.com/' 'https://*.firebaseio.com' 'https://www.googleapis.com'; object-src 'self'"
-
   },
   "manifest_version" : 3
 }

@@ -355,7 +355,7 @@ export default class WorkHourChecker {
 			});근
 			await firebaseApp.addWorktimeLog({
 				username,
-				type: '퇴시간'
+				type: '퇴근시간'
 			});
 			Share.showNotify('퇴근도장', msg, true);
 		} else {
