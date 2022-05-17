@@ -31,6 +31,9 @@ export default class WorkHourChecker {
 			return;
 		}
 
+		// 반차여부 로깅
+		this.isUserDayHalfOff(params.currDate, params.dayOffList, params.username);
+
 		const isAlreadyClockIn = await this.isMarkedClockInAlready();
 		if (!isAlreadyClockIn) {
 			await this.markAsClockIn(params);
@@ -286,30 +289,36 @@ export default class WorkHourChecker {
 	isUserDayHalfOff = (currDate, dayOffList, username) => {
 		const logPrefix = '[개인 반차 여부 체크] > ';
 		let todayDayOffList = dayOffList[currDate];
+		let dayHalfOffString = '';
 		if (todayDayOffList) {
 			todayDayOffList.forEach(item => {
 				if (item.indexOf(username) > -1) {
 					if (item.indexOf('오전') > -1 && item.indexOf('반반차') > -1) {
 						this.printLog(`${logPrefix} 오전반반차`);
-						return '오전반반차';
+						dayHalfOffString = '오전반반차';
+						return false;
 					} else if (item.indexOf('오후') > -1 && item.indexOf('반반차') > -1) {
 						this.printLog(`${logPrefix} 오후반반차`);
-						return '오후반반차';
+						dayHalfOffString = '오후반반차';
+						return false;
 					} else if (item.indexOf('오전') > -1) {
 						this.printLog(`${logPrefix} 오전반차`);
-						return '오전반차';
+						dayHalfOffString = '오전반차';
+						return false;
 					} else if (item.indexOf('오후') > -1) {
 						this.printLog(`${logPrefix} 오후반차`);
-						return '오후반차';
+						dayHalfOffString = '오후반차';
+						return false;
 					} else if (item.indexOf('반차') > -1) {
 						this.printLog(`${logPrefix} 오늘은 반차입니다. (오전/오후 알수 없음)`);
-						return '오전';
+						dayHalfOffString = '오후반반차';
+						return false;
 					}
 				}
 			});
 		}
 
-		return '';
+		return dayHalfOffString;
 	}
 
 	requestClockIn = async (userId, username) => {

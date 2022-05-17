@@ -125,7 +125,7 @@ class FirebaseApp {
 		const { username, type } = params;
 		const db = this.db;
 
-		let currTime = getCurrTime();
+		let currTime = Share.getCurrTime();
 		const key = `worktime_checker/${Share.getCurrDateToMonth()}/${Share.getCurrDay()}/${username}/${type}`;
 
 		await set(ref(db, key), currTime);
