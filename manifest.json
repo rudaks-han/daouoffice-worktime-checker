@@ -1,7 +1,7 @@
 {
-  "name": "그룹웨어 출근 확인 v3",
+  "name": "그룹웨어 출퇴근 확인 v3",
   "version": "0.0.1",
-  "description": "그룹웨어(다우오피스) 근무시간을 확인하는 기능을 제공합니다.",
+  "description": "그룹웨어(다우오피스)에 출퇴근을 자동으로 기록하는 기능을 제공합니다.",
   "action": {
     "default_icon": "images/icon-128.png",
     "default_popup": "popup/popup.html"
