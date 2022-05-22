@@ -43,7 +43,7 @@ class Share {
     }
 
     static getCurrDateToMonth() {
-        return getCurrYear() + '-' + getCurrMonth();
+        return Share.getCurrYear() + '-' + Share.getCurrMonth();
     }
 
     static getCurrDay() {
