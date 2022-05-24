@@ -54,7 +54,6 @@
     </div>
 
     <div class="ui button primary" id="btnSave">저장하기</div>
-
 </form>
 
 
@@ -163,35 +162,6 @@
 
 		$(str).appendTo('body').fadeIn('slow').delay(3000);//.fadeOut('slow');
     }
-/*
-	function firebaseInit()
-	{
-		const config = {
-			apiKey: "AIzaSyBeWHyVqAAk-kXXPtsEg-4IK66P9Xjma4A",
-			authDomain: "spectra-groupware.firebaseapp.com",
-			databaseURL: "https://spectra-groupware.firebaseio.com",
-			projectId: "spectra-groupware",
-			storageBucket: "spectra-groupware.appspot.com",
-			messagingSenderId: "785900078227"
-		};
-		_firebase = firebase.initializeApp(config);
-	}
-
-	//writeLog(date, user, key, value)
-	function setFirebase(key, value)
-	{
-		_firebase.database().ref(key).set({
-			value
-		});
-	}
-
-	function getFirebase(key, callback)
-	{
-		var ref = _firebase.database().ref(key);
-		ref.on('value', function(snapshot) {
-			callback(snapshot);
-		});
-	}*/
 </script>
 
 
