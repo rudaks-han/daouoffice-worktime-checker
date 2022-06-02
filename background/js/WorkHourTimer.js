@@ -8,7 +8,7 @@ const workHourChecker = new WorkHourChecker();
 export default class WorkHourTimer {
 
 	constructor() {
-		this.userSessionIntervalTime = 5 * 60 * 1000; // 5분 마다
+		//this.userSessionIntervalTime = 5 * 60 * 1000; // 5분 마다
 		this.calendarIntervalTime = 60 * 60 * 1000; // 1시간 마다
 		this.intervalTime = 60 * 1000; // 1분마다
 		this.holidayList = {};
@@ -25,7 +25,7 @@ export default class WorkHourTimer {
 		setInterval(() => {
 			// 세션정보
 			_this.checkUserSession();
-		}, this.userSessionIntervalTime);
+		}, this.intervalTime);
 
 		setInterval(() => {
 			// 달력정보
@@ -48,6 +48,7 @@ export default class WorkHourTimer {
 
 	checkUserSession = async () => {
 		const userSession = await daouofficeClient.getSession();
+		console.log('[checkUserSession] userSession: ' + userSession);
 		this.userSession = userSession;
 	}
 
@@ -57,6 +58,10 @@ export default class WorkHourTimer {
 	}
 
 	parseCalendar = (response) => {
+		if (!response.data) {
+			console.error('[parseCalendar] response.data is undefined');
+			return;
+		}
 		const list = response.data.list;
 		list.forEach(item => {
 			const datetime = item.datetime;
@@ -105,9 +110,11 @@ export default class WorkHourTimer {
 		const currDate = Share.getCurrDate();
 		const now = new Date();
 		/*const username = '백명구';
-		const currDate = '2022-05-06';*/
-		//const now = new Date('2022-05-13T16:01:00');
+		const currDate = '2022-06-02';
+		const now = new Date('2022-06-02T06:50:00');*/
 
+		console.log('dayOffList')
+		console.log(this.dayOffList)
 		const params = {
 			username,
 			currDate,

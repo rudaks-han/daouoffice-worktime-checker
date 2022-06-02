@@ -90,6 +90,8 @@ export default class DaouofficeClient {
 
 	async loginByUserConfig() {
 		const userConfig = await this.getUserConfig();
+		console.log('#loginByUserConfig')
+		console.log(userConfig)
 		const params = {
 			username: userConfig.username,
 			password: userConfig.password

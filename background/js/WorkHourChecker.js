@@ -122,6 +122,8 @@ export default class WorkHourChecker {
 
 	markAsClockIn = async params => {
 		const { userConfig, currDate, dayOffList, username, now, userSession } = params;
+		console.log('markAsClockIn: ')
+		console.log(userSession)
 		const userId = userSession.data.id;
 		const {
 			clockInBeforeMinute,
@@ -162,6 +164,8 @@ export default class WorkHourChecker {
 
 	markAsClockOut = async params => {
 		const { userConfig, currDate, dayOffList, username, now, userSession } = params;
+		console.log('markAsClockOut: ')
+		console.log(userSession)
 		const userId = userSession.data.id;
 		const {
 			clockOutBeforeMinute,
@@ -340,7 +344,7 @@ export default class WorkHourChecker {
 			Share.showNotify('출근도장', msg, true);
 		} else {
 			if (name === 'timeline.clockin.duplication') { // 출근이 중복하여 존재합니다.
-				Share.showNotify('출근도장', message, true);
+				Share.showNotify('출근도장', message, false);
 				await StorageUtil.set({
 					clockInDateStorageKey: currDate
 				});
@@ -369,7 +373,7 @@ export default class WorkHourChecker {
 			Share.showNotify('퇴근도장', msg, true);
 		} else {
 			if (name === 'timeline.clockout.duplacation') { // 퇴근이 중복하여 존재합니다.
-				Share.showNotify('퇴근도장', message, true);
+				Share.showNotify('퇴근도장', message, false);
 				await StorageUtil.set({
 					clockOutDateStorageKey: currDate
 				});
