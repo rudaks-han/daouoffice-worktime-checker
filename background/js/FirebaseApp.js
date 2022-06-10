@@ -2,6 +2,7 @@ import {initializeApp} from "./firebase/firebase-app.js";
 import {get, getConnectStatus, getDatabase, onValue, ref, set} from "./firebase/firebase-database.js";
 import DaouofficeClient from "./DaouofficeClient.js";
 import Share from "./lib/Share.js";
+import Logger from "./lib/Logger.js";
 
 const daouofficeClient = new DaouofficeClient();
 
@@ -18,10 +19,6 @@ class FirebaseApp {
 		this.checkNetworkConnection();
 	}
 
-	printLog(str) {
-		console.log(`[firebase] ${str}`);
-	}
-
 	checkNetworkConnection() {
 		const _this = this;
 
@@ -29,12 +26,12 @@ class FirebaseApp {
 		setInterval(() => {
 			const connectStatus = getConnectStatus();
 			if (!connectStatus) {
-				_this.printLog("firebase disconnected");
+				Logger.println("firebase disconnected");
 				connected = false;
 			} else {
 				if (!connected) {
 					connected = true;
-					_this.printLog("firebase reconnected");
+					Logger.println("firebase reconnected");
 				}
 				_this.addEvent(_this.db);
 			}
@@ -68,7 +65,7 @@ class FirebaseApp {
 		const _this = this;
 		const buildRef = ref(this.db, `build-status`);
 		onValue(buildRef, (snapshot) => {
-			_this.printLog('dummy test callback');
+			Logger.println('dummy test callback');
 		});
 	}
 
@@ -99,8 +96,8 @@ class FirebaseApp {
 				data: userConfig
 			})
 
-			this.printLog('userConfigChangedCallback');
-			this.printLog(`[${username}] useFlag changed: ${useFlag}`);
+			Logger.println('userConfigChangedCallback');
+			Logger.println(`[${username}] useFlag changed: ${useFlag}`);
 		}
 	}
 

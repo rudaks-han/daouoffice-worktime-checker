@@ -1,5 +1,9 @@
 class Share {
 
+    static getFullCurrDate() {
+        return this.getCurrDate() + ' ' + this.getCurrTime();
+    }
+
     static getCurrDate() {
         var currDate = new Date();
         var year = currDate.getFullYear();
@@ -14,18 +18,8 @@ class Share {
     }
 
     static getCurrTime() {
-        var currDate = new Date();
-        var hour = currDate.getHours();
-        if (hour < 10)
-            hour = '0' + hour;
-        var minute = currDate.getMinutes();
-        if (minute < 10)
-            minute = '0' + minute;
-        var second = currDate.getSeconds();
-        if (second < 10)
-            second = '0' + second;
-
-        return hour + ':' + minute + ':' + second;
+        const currDate = new Date();
+        return this.getTimeFormat(currDate);
     }
 
     static getCurrYear() {
@@ -53,6 +47,20 @@ class Share {
             day = '0' + day;
 
         return day;
+    }
+
+    static getTimeFormat(date) {
+        var hour = date.getHours();
+        if (hour < 10)
+            hour = '0' + hour;
+        var minute = date.getMinutes();
+        if (minute < 10)
+            minute = '0' + minute;
+        var second = date.getSeconds();
+        if (second < 10)
+            second = '0' + second;
+
+        return hour + ':' + minute + ':' + second;
     }
 
     static addDays(date, day) {

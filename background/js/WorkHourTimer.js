@@ -1,6 +1,7 @@
 import DaouofficeClient from "./DaouofficeClient.js";
 import WorkHourChecker  from "./WorkHourChecker.js";
 import Share from "./lib/Share.js";
+import Logger from "./lib/Logger.js";
 
 const daouofficeClient = new DaouofficeClient();
 const workHourChecker = new WorkHourChecker();
@@ -14,10 +15,6 @@ export default class WorkHourTimer {
 		this.holidayList = {};
 		this.dayOffList = {};
 		this.userSession = {};
-	}
-
-	printLog(str) {
-		console.log(`[WorkHourTimer] ${str}`);
 	}
 
 	start = async () => {
@@ -48,7 +45,8 @@ export default class WorkHourTimer {
 
 	checkUserSession = async () => {
 		const userSession = await daouofficeClient.getSession();
-		console.log('[checkUserSession] userSession: ' + userSession);
+		Logger.println('[checkUserSession] userSession');
+		Logger.println(userSession, false);
 		this.userSession = userSession;
 	}
 
@@ -102,7 +100,7 @@ export default class WorkHourTimer {
 	checkWorkHour = async () => {
 		const userConfig = await this.getUserConfig();
 		if (!userConfig || userConfig.useFlag != 'Y') {
-			this.printLog('>>> 출퇴근 체크가 사용하지 않음으로 설정되어 있습니다.');
+			Logger.println('>>> 출퇴근 체크가 사용하지 않음으로 설정되어 있습니다.');
 			return;
 		}
 
@@ -113,8 +111,6 @@ export default class WorkHourTimer {
 		const currDate = '2022-06-02';
 		const now = new Date('2022-06-02T06:50:00');*/
 
-		console.log('dayOffList')
-		console.log(this.dayOffList)
 		const params = {
 			username,
 			currDate,
@@ -125,7 +121,7 @@ export default class WorkHourTimer {
 			now
 		}
 
-		this.printLog('start...');
+		Logger.println('start...');
 		await workHourChecker.check(params);
 	}
 }

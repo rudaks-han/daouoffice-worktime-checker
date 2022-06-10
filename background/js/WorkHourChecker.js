@@ -1,5 +1,6 @@
 import DaouofficeClient from "./DaouofficeClient.js";
 import Share from "./lib/Share.js";
+import Logger from "./lib/Logger.js";
 import StorageUtil from "./lib/storageUtil.js";
 import FirebaseApp from "./FirebaseApp.js";
 
@@ -9,10 +10,6 @@ const firebaseApp = new FirebaseApp();
 export default class WorkHourChecker {
 
 	constructor() {
-	}
-
-	printLog(str) {
-		console.log(`[WorkHourChecker] ${str}`);
 	}
 
 	check = async params => {
@@ -50,10 +47,10 @@ export default class WorkHourChecker {
 		const { currDate } = params;
 		const date = new Date(currDate + 'T12:00:00');
 		if (date.getDay() == 0 || date.getDay() == 6) { // 토, 일 제외
-			this.printLog(`${logPrefix} 오늘은 주말입니다.`);
+			Logger.println(`${logPrefix} 오늘은 주말입니다.`);
 			return true;
 		} else {
-			this.printLog(`${logPrefix} 오늘은 평일입니다.`);
+			Logger.println(`${logPrefix} 오늘은 평일입니다.`);
 			return false;
 		}
 	}
@@ -62,10 +59,10 @@ export default class WorkHourChecker {
 		const logPrefix = '[공휴일 여부 체크] > ';
 		const { currDate, holidayList } = params;
 		if (holidayList[currDate]) {
-			this.printLog(`${logPrefix} 오늘은 공휴일입니다.`);
+			Logger.println(`${logPrefix} 오늘은 공휴일입니다.`);
 			return true;
 		} else {
-			this.printLog(`${logPrefix} 오늘은 평일입니다.`);
+			Logger.println(`${logPrefix} 오늘은 평일입니다.`);
 			return false;
 		}
 	}
@@ -84,13 +81,13 @@ export default class WorkHourChecker {
 					}
 
 					if (dayOff) { // 연차
-						this.printLog(`${logPrefix} 오늘은 연차입니다.`);
+						Logger.println(`${logPrefix} 오늘은 연차입니다.`);
 						return true;
 					}
 				}
 			});
 		}
-		this.printLog(`${logPrefix} 오늘은 연차가 아닙니다.`);
+		Logger.println(`${logPrefix} 오늘은 연차가 아닙니다.`);
 		return false;
 	}
 
@@ -99,10 +96,10 @@ export default class WorkHourChecker {
 		const clockInDate = await StorageUtil.get('clockInDateStorageKey')
 
 		if (clockInDate === Share.getCurrDate()) {
-			this.printLog(`${logPrefix} 이미 출근도장이 찍혀져 있습니다.`);
+			Logger.println(`${logPrefix} 이미 출근도장이 찍혀져 있습니다.`);
 			return true;
 		} else {
-			this.printLog(`${logPrefix} X`);
+			Logger.println(`${logPrefix} X`);
 			return false;
 		}
 	}
@@ -112,10 +109,10 @@ export default class WorkHourChecker {
 		const clockOutDate = await StorageUtil.get('clockOutDateStorageKey')
 
 		if (clockOutDate === Share.getCurrDate()) {
-			this.printLog(`${logPrefix} 이미 퇴근도장이 찍혀져 있습니다.`);
+			Logger.println(`${logPrefix} 이미 퇴근도장이 찍혀져 있습니다.`);
 			return true;
 		} else {
-			this.printLog(`${logPrefix} X`);
+			Logger.println(`${logPrefix} X`);
 			return false;
 		}
 	}
@@ -240,14 +237,14 @@ export default class WorkHourChecker {
 		if (now >= clockInMarkingTime) {
 			let validTime = Share.addMinutes(startWorkTimeDate, 60); // 기준시간 09:00
 			if (now > validTime) {
-				this.printLog(`${logPrefix} 1시간 초과됨`);
+				Logger.println(`${logPrefix} 1시간 초과됨`);
 				return false;
 			} else {
-				this.printLog(`${logPrefix} 출근도장 찍을 시간`);
+				Logger.println(`${logPrefix} 출근도장 찍을 시간`);
 				return true;
 			}
 		} else {
-			this.printLog(`${logPrefix} 출근도장 찍을 시간 아님. 출근도장 찍을 시간: ${clockInMarkingTime}`);
+			Logger.println(`${logPrefix} 출근도장 찍을 시간 아님. 출근도장 찍을 시간: ${Share.getTimeFormat(clockInMarkingTime)}`);
 			return false;
 		}
 	}
@@ -278,14 +275,14 @@ export default class WorkHourChecker {
 		if (now >= clockOutMarkingTime) {
 			let validTime = Share.addMinutes(endWorkTimeDate, 60); // 기준시간 18:00 (17:00 + 01:00)
 			if (now > validTime) {
-				this.printLog(`${logPrefix} 퇴근도장 찍을 유효시간(1시간) 초과됨`);
+				Logger.println(`${logPrefix} 퇴근도장 찍을 유효시간(1시간) 초과됨`);
 				return false
 			} else {
-				this.printLog(`${logPrefix} 퇴근도장 찍을 시간`);
+				Logger.println(`${logPrefix} 퇴근도장 찍을 시간`);
 				return true;
 			}
 		} else {
-			this.printLog(`${logPrefix} 퇴근도장 찍을 시간 아님, 퇴근시간 찍을 시간: ${clockOutMarkingTime}`);
+			Logger.println(`${logPrefix} 퇴근도장 찍을 시간 아님, 퇴근시간 찍을 시간: ${Share.getTimeFormat(clockOutMarkingTime)}`);
 			return false;
 		}
 	}
@@ -298,23 +295,23 @@ export default class WorkHourChecker {
 			todayDayOffList.forEach(item => {
 				if (item.indexOf(username) > -1) {
 					if (item.indexOf('오전') > -1 && item.indexOf('반반차') > -1) {
-						this.printLog(`${logPrefix} 오전반반차`);
+						Logger.println(`${logPrefix} 오전반반차`);
 						dayHalfOffString = '오전반반차';
 						return false;
 					} else if (item.indexOf('오후') > -1 && item.indexOf('반반차') > -1) {
-						this.printLog(`${logPrefix} 오후반반차`);
+						Logger.println(`${logPrefix} 오후반반차`);
 						dayHalfOffString = '오후반반차';
 						return false;
 					} else if (item.indexOf('오전') > -1) {
-						this.printLog(`${logPrefix} 오전반차`);
+						Logger.println(`${logPrefix} 오전반차`);
 						dayHalfOffString = '오전반차';
 						return false;
 					} else if (item.indexOf('오후') > -1) {
-						this.printLog(`${logPrefix} 오후반차`);
+						Logger.println(`${logPrefix} 오후반차`);
 						dayHalfOffString = '오후반차';
 						return false;
 					} else if (item.indexOf('반차') > -1) {
-						this.printLog(`${logPrefix} 오늘은 반차입니다. (오전/오후 알수 없음)`);
+						Logger.println(`${logPrefix} 오늘은 반차입니다. (오전/오후 알수 없음)`);
 						dayHalfOffString = '오후반반차';
 						return false;
 					}
@@ -326,7 +323,7 @@ export default class WorkHourChecker {
 	}
 
 	requestClockIn = async (userId, username) => {
-		this.printLog(' ======> requestClockIn');
+		Logger.println(' ======> requestClockIn');
 		const response = await daouofficeClient.requestClockIn(userId);
 		const { code, message, name } = response;
 		const currDate = Share.getCurrDate();
@@ -355,7 +352,7 @@ export default class WorkHourChecker {
 	}
 
 	requestClockOut = async (userId, username) => {
-		this.printLog(' ======> requestClockOut');
+		Logger.println(' ======> requestClockOut');
 		const response = await daouofficeClient.requestClockOut(userId);
 		const { code, message, name } = response;
 		const currDate = Share.getCurrDate();

@@ -1,7 +1,7 @@
 import HttpRequest from "./lib/httpRequest.js";
 import StorageUtil from "./lib/storageUtil.js";
 import Share from "./lib/Share.js";
-
+import Logger from "./lib/Logger.js";
 
 export default class DaouofficeClient {
 	BASE_URL = 'https://spectra.daouoffice.com';
@@ -79,8 +79,8 @@ export default class DaouofficeClient {
 				userInfo
 			});
 		} else {
-			console.error('사용자 세션정보 요청 실패');
-			console.error(response);
+			Logger.println('사용자 세션정보 요청 실패');
+			Logger.println(response);
 
 			this.loginByUserConfig();
 		}
@@ -90,8 +90,8 @@ export default class DaouofficeClient {
 
 	async loginByUserConfig() {
 		const userConfig = await this.getUserConfig();
-		console.log('#loginByUserConfig')
-		console.log(userConfig)
+		Logger.println('#loginByUserConfig')
+		Logger.println(userConfig)
 		const params = {
 			username: userConfig.username,
 			password: userConfig.password
