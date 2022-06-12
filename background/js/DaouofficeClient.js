@@ -96,7 +96,7 @@ export default class DaouofficeClient {
 			username: userConfig.username,
 			password: userConfig.password
 		}
-		this.login(params);
+		await this.login(params);
 	}
 
 

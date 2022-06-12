@@ -122,6 +122,17 @@ export default class WorkHourTimer {
 		}
 
 		Logger.println('start...');
+
+		if (params.userSession.code == "401") {
+			// 인증되지 않았습니다.
+			Logger.println("인증되지 않았음. try login.. ");
+			await daouofficeClient.loginByUserConfig();
+			const userSession = await daouofficeClient.getSession();
+
+			params.userSession = userSession;
+		}
+
+
 		await workHourChecker.check(params);
 	}
 }
