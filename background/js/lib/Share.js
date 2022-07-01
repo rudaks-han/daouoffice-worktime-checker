@@ -1,3 +1,5 @@
+import Logger from "./Logger.js";
+
 class Share {
 
     static getFullCurrDate() {
@@ -80,6 +82,8 @@ class Share {
 
     static showNotify(title, message, requireInteraction = false) {
         if (Notification && Notification.permission !== "granted") {
+            Logger.error('showNotify error');
+            Logger.error(Notification);
             Notification.requestPermission(function (status) {
                 if (Notification.permission !== status) {
                     Notification.permission = status;
@@ -87,13 +91,13 @@ class Share {
             });
         }
         if (Notification && Notification.permission === "granted") {
-            let start = Date.now();
-            let id = new Date().getTime() + '';
             let options = {
                 type: 'basic',
                 iconUrl: '/images/icon.png',
                 title: title,
                 message: message,
+                priority: 2,
+                eventTime: Date.now(),
                 requireInteraction: requireInteraction
             };
 
@@ -102,6 +106,12 @@ class Share {
             chrome.notifications.onClicked.addListener(function(notificationId, byUser) {
                 chrome.notifications.clear(notificationId, function() {});
             });
+
+            Logger.println('chrome notification가 실행되었습니다.');
+            Logger.println(`title: ${title}, message: ${message}`);
+        } else {
+            Logger.error(`[showNotify] Notification 권한이 없습니다.`);
+            Logger.error(Notification);
         }
 
     }

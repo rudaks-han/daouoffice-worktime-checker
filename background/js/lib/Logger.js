@@ -13,7 +13,10 @@ export default class Logger {
         } else {
             console.log(str);
         }
+    }
 
+    static error(str) {
+        console.error(str);
     }
 
     static getCaller() {
@@ -28,6 +31,5 @@ export default class Logger {
         }
 
         return caller;
-
     }
 }

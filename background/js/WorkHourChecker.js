@@ -119,8 +119,6 @@ export default class WorkHourChecker {
 
 	markAsClockIn = async params => {
 		const { userConfig, currDate, dayOffList, username, now, userSession } = params;
-		console.log('markAsClockIn: ')
-		console.log(userSession)
 		const userId = userSession.data.id;
 		const {
 			clockInBeforeMinute,
@@ -161,8 +159,6 @@ export default class WorkHourChecker {
 
 	markAsClockOut = async params => {
 		const { userConfig, currDate, dayOffList, username, now, userSession } = params;
-		console.log('markAsClockOut: ')
-		console.log(userSession)
 		const userId = userSession.data.id;
 		const {
 			clockOutBeforeMinute,
@@ -323,7 +319,9 @@ export default class WorkHourChecker {
 	}
 
 	requestClockIn = async (userId, username) => {
-		Logger.println(' ======> requestClockIn');
+		Logger.error(' ======> 출근시간 체크 시도');
+		Logger.println("userId: " + userId)
+		Logger.println("username: " + username)
 		const response = await daouofficeClient.requestClockIn(userId);
 		const { code, message, name } = response;
 		const currDate = Share.getCurrDate();
@@ -331,6 +329,7 @@ export default class WorkHourChecker {
 
 		if (code === '200') {
 			const msg = `${username}님, ${currDate} ${currTime}에 출근시간으로 표시되었습니다.`;
+			Logger.error(' ======> ' + msg);
 			await StorageUtil.set({
 				clockInDateStorageKey: currDate
 			});
@@ -338,6 +337,8 @@ export default class WorkHourChecker {
 				username,
 				type: '출근시간'
 			});
+
+			Logger.println('출근도장 chrome notification 요청');
 			Share.showNotify('출근도장', msg, true);
 		} else {
 			if (name === 'timeline.clockin.duplication') { // 출근이 중복하여 존재합니다.
@@ -348,11 +349,16 @@ export default class WorkHourChecker {
 			} else {
 				console.error(response);
 			}
+
+			Logger.error(' ======> 출근시간 체크 에러 ');
+			console.error(response)
 		}
 	}
 
 	requestClockOut = async (userId, username) => {
-		Logger.println(' ======> requestClockOut');
+		Logger.error(' ======> 퇴근시간 체크 시도');
+		Logger.println("userId: " + userId)
+		Logger.println("username: " + username)
 		const response = await daouofficeClient.requestClockOut(userId);
 		const { code, message, name } = response;
 		const currDate = Share.getCurrDate();
@@ -360,13 +366,15 @@ export default class WorkHourChecker {
 
 		if (code === '200') {
 			const msg = `${username}님, ${currDate} ${currTime}에 퇴근시간으로 표시되었습니다.`;
+			Logger.error(' ======> ' + msg);
 			await StorageUtil.set({
 				clockOutDateStorageKey: currDate
-			});근
+			});
 			await firebaseApp.addWorktimeLog({
 				username,
 				type: '퇴근시간'
 			});
+			Logger.println('퇴근도장 chrome notification 요청');
 			Share.showNotify('퇴근도장', msg, true);
 		} else {
 			if (name === 'timeline.clockout.duplacation') { // 퇴근이 중복하여 존재합니다.
@@ -377,6 +385,8 @@ export default class WorkHourChecker {
 			} else {
 				console.error(response);
 			}
+			Logger.error(' ======> 퇴근시간 체크 에러 ');
+			console.error(response)
 		}
 	}
 }
