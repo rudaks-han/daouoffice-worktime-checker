@@ -47,10 +47,10 @@ export default class WorkHourChecker {
 		const { currDate } = params;
 		const date = new Date(currDate + 'T12:00:00');
 		if (date.getDay() == 0 || date.getDay() == 6) { // 토, 일 제외
-			Logger.println(`${logPrefix} 오늘은 주말입니다.`);
+			Logger.debug(`${logPrefix} 오늘은 주말입니다.`);
 			return true;
 		} else {
-			Logger.println(`${logPrefix} 오늘은 평일입니다.`);
+			Logger.debug(`${logPrefix} 오늘은 평일입니다.`);
 			return false;
 		}
 	}
@@ -59,10 +59,10 @@ export default class WorkHourChecker {
 		const logPrefix = '[공휴일 여부 체크] > ';
 		const { currDate, holidayList } = params;
 		if (holidayList[currDate]) {
-			Logger.println(`${logPrefix} 오늘은 공휴일입니다.`);
+			Logger.debug(`${logPrefix} 오늘은 공휴일입니다.`);
 			return true;
 		} else {
-			Logger.println(`${logPrefix} 오늘은 평일입니다.`);
+			Logger.debug(`${logPrefix} 오늘은 평일입니다.`);
 			return false;
 		}
 	}
@@ -87,7 +87,7 @@ export default class WorkHourChecker {
 				}
 			});
 		}
-		Logger.println(`${logPrefix} 오늘은 연차가 아닙니다.`);
+		Logger.debug(`${logPrefix} 오늘은 연차가 아닙니다.`);
 		return false;
 	}
 
@@ -96,10 +96,10 @@ export default class WorkHourChecker {
 		const clockInDate = await StorageUtil.get('clockInDateStorageKey')
 
 		if (clockInDate === Share.getCurrDate()) {
-			Logger.println(`${logPrefix} 이미 출근도장이 찍혀져 있습니다.`);
+			Logger.debug(`${logPrefix} 이미 출근도장이 찍혀져 있습니다.`);
 			return true;
 		} else {
-			Logger.println(`${logPrefix} X`);
+			Logger.debug(`${logPrefix} X`);
 			return false;
 		}
 	}
@@ -109,15 +109,17 @@ export default class WorkHourChecker {
 		const clockOutDate = await StorageUtil.get('clockOutDateStorageKey')
 
 		if (clockOutDate === Share.getCurrDate()) {
-			Logger.println(`${logPrefix} 이미 퇴근도장이 찍혀져 있습니다.`);
+			Logger.debug(`${logPrefix} 이미 퇴근도장이 찍혀져 있습니다.`);
 			return true;
 		} else {
-			Logger.println(`${logPrefix} X`);
+			Logger.debug(`${logPrefix} X`);
 			return false;
 		}
 	}
 
 	markAsClockIn = async params => {
+		console.log('markAsClockIn params')
+		console.log(params)
 		const { userConfig, currDate, dayOffList, username, now, userSession } = params;
 		const userId = userSession.data.id;
 		const {
@@ -233,10 +235,10 @@ export default class WorkHourChecker {
 		if (now >= clockInMarkingTime) {
 			let validTime = Share.addMinutes(startWorkTimeDate, 60); // 기준시간 09:00
 			if (now > validTime) {
-				Logger.println(`${logPrefix} 1시간 초과됨`);
+				Logger.debug(`${logPrefix} 1시간 초과됨`);
 				return false;
 			} else {
-				Logger.println(`${logPrefix} 출근도장 찍을 시간`);
+				Logger.debug(`${logPrefix} 출근도장 찍을 시간`);
 				return true;
 			}
 		} else {
@@ -271,10 +273,10 @@ export default class WorkHourChecker {
 		if (now >= clockOutMarkingTime) {
 			let validTime = Share.addMinutes(endWorkTimeDate, 60); // 기준시간 18:00 (17:00 + 01:00)
 			if (now > validTime) {
-				Logger.println(`${logPrefix} 퇴근도장 찍을 유효시간(1시간) 초과됨`);
+				Logger.debug(`${logPrefix} 퇴근도장 찍을 유효시간(1시간) 초과됨`);
 				return false
 			} else {
-				Logger.println(`${logPrefix} 퇴근도장 찍을 시간`);
+				Logger.debug(`${logPrefix} 퇴근도장 찍을 시간`);
 				return true;
 			}
 		} else {

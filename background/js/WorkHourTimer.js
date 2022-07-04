@@ -46,7 +46,7 @@ export default class WorkHourTimer {
 	checkUserSession = async () => {
 		const userSession = await daouofficeClient.getSession();
 		Logger.println('[checkUserSession] userSession');
-		Logger.println(userSession, false);
+		//Logger.println(userSession, false);
 		this.userSession = userSession;
 	}
 

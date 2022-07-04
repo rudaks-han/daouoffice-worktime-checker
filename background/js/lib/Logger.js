@@ -2,6 +2,8 @@ import Share from "./Share.js";
 
 export default class Logger {
 
+    static LOG_LEVEL = 2;
+
     static println(str, showPrefix = true) {
         if (showPrefix) {
             const caller = this.getCaller();
@@ -17,6 +19,12 @@ export default class Logger {
 
     static error(str) {
         console.error(str);
+    }
+
+    static debug(str, showPrefix) {
+        if (this.LOG_LEVEL <= 1) {
+            this.println(str, showPrefix);
+        }
     }
 
     static getCaller() {
