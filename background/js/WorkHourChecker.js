@@ -327,9 +327,7 @@ export default class WorkHourChecker {
 	}
 
 	requestClockIn = async (userId, username) => {
-		Logger.error(' ======> 출근시간 체크 시도');
-		Logger.println("userId: " + userId)
-		Logger.println("username: " + username)
+		Logger.println("requestClockIn", false);
 		const response = await daouofficeClient.requestClockIn(userId);
 		const { code, message, name } = response;
 		const currDate = Share.getCurrDate();
@@ -346,8 +344,7 @@ export default class WorkHourChecker {
 				type: '출근시간'
 			});
 
-			Logger.println('출근도장 chrome notification 요청');
-			Share.showNotify('출근도장', msg, true);
+			Share.showNotify('출근도장', msg, false);
 		} else {
 			if (name === 'timeline.clockin.duplication') { // 출근이 중복하여 존재합니다.
 				Share.showNotify('출근도장', message, true);
@@ -355,11 +352,9 @@ export default class WorkHourChecker {
 					clockInDateStorageKey: currDate
 				});
 			} else {
+				Logger.error(' ======> 출근시간 체크 에러 ');
 				console.error(response);
 			}
-
-			Logger.error(' ======> 출근시간 체크 에러 ');
-			console.error(response)
 		}
 	}
 
@@ -382,8 +377,8 @@ export default class WorkHourChecker {
 				username,
 				type: '퇴근시간'
 			});
-			Logger.println('퇴근도장 chrome notification 요청');
-			Share.showNotify('퇴근도장', msg, true);
+
+			Share.showNotify('퇴근도장', msg, false);
 		} else {
 			if (name === 'timeline.clockout.duplacation') { // 퇴근이 중복하여 존재합니다.
 				Share.showNotify('퇴근도장', message, true);
@@ -391,10 +386,9 @@ export default class WorkHourChecker {
 					clockOutDateStorageKey: currDate
 				});
 			} else {
+				Logger.error(' ======> 퇴근시간 체크 에러 ');
 				console.error(response);
 			}
-			Logger.error(' ======> 퇴근시간 체크 에러 ');
-			console.error(response)
 		}
 	}
 }
