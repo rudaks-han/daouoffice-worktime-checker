@@ -9,36 +9,10 @@ const workHourChecker = new WorkHourChecker();
 export default class WorkHourTimer {
 
 	constructor() {
-		//this.userSessionIntervalTime = 5 * 60 * 1000; // 5분 마다
-		this.calendarIntervalTime = 60 * 60 * 1000; // 1시간 마다
-		this.intervalTime = 60 * 1000; // 1분마다
 		this.holidayList = {};
 		this.dayOffList = {};
 		this.userSession = {};
-		this.userSessionChecker = null;
 	}
-
-	/*start = async () => {
-		const _this = this;
-		this.userSessionChecker = setInterval(() => {
-			// 세션정보
-			_this.checkUserSession();
-		}, this.intervalTime);
-
-		setInterval(() => {
-			// 달력정보
-			_this.checkCalendar();
-		}, this.calendarIntervalTime);
-
-		setInterval(() => {
-			// 출근체크
-			_this.checkWorkHour();
-		}, this.intervalTime);
-
-		await _this.checkUserSession();
-		await _this.checkCalendar();
-		await _this.checkWorkHour();
-	}*/
 
 	initialize = async () => {
 		const _this = this;
@@ -52,19 +26,23 @@ export default class WorkHourTimer {
 	}
 
 	checkUserSession = async () => {
-		const userSession = await daouofficeClient.getSession();
-		Logger.println('[checkUserSession] userSession');
-		//Logger.println(userSession, false);
+		Logger.println("WorkHourTimer#checkUserSession ==> 인증되지 않았음. try login.. ");
+		let userSession = await daouofficeClient.getSession();
+		if (!(userSession && userSession.code === '200')) {
+			Logger.println("재로그인 후 getSession 요청");
+			userSession = await daouofficeClient.getSession();
+		}
+
 		this.userSession = userSession;
 	}
 
 	checkCalendar = async () => {
 		const response = await daouofficeClient.getCalendar();
-		this.parseCalendar(response);
+		await this.parseCalendar(response);
 	}
 
 	parseCalendar = (response) => {
-		if (!response.data) {
+		if (response == null || !response.data) {
 			console.error('[parseCalendar] response.data is undefined');
 			return;
 		}
@@ -131,12 +109,12 @@ export default class WorkHourTimer {
 
 		if (!params.userSession || params.userSession.code == "401" || Object.entries(params.userSession).length === 0) {
 			// 인증되지 않았습니다.
-			Logger.println("인증되지 않았음. try login.. ");
-			await daouofficeClient.loginByUserConfig();
-			const userSession = await daouofficeClient.getSession();
-
-			Logger.println('로그인 한후에 getSession 가져옴')
-			console.error(userSession)
+			Logger.println("WorkHourTimer#userSession ==> 인증되지 않았음. try login.. ");
+			let userSession = await daouofficeClient.getSession();
+			if (!(userSession && userSession.code === '200')) {
+				Logger.println("재로그인 후 getSession 요청");
+				userSession = await daouofficeClient.getSession();
+			}
 
 			params.userSession = userSession;
 		}

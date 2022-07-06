@@ -56,6 +56,7 @@ export default class DaouofficeClient {
 		};
 
 		const url = `${this.BASE_URL}/api/login`;
+
 		return await HttpRequest.request(url, options);
 	}
 
@@ -80,9 +81,7 @@ export default class DaouofficeClient {
 			});
 		} else {
 			Logger.println('사용자 세션정보 요청 실패');
-			Logger.println(response);
-
-			this.loginByUserConfig();
+			await this.loginByUserConfig();
 		}
 
 		return response;
@@ -91,7 +90,6 @@ export default class DaouofficeClient {
 	async loginByUserConfig() {
 		const userConfig = await this.getUserConfig();
 		Logger.println('#loginByUserConfig')
-		console.log(userConfig)
 		const params = {
 			username: userConfig.username,
 			password: userConfig.password
@@ -108,6 +106,7 @@ export default class DaouofficeClient {
 		};
 
 		const url = `${this.BASE_URL}/api/calendar/user/me/event/daily?year=${Share.getCurrYear()}&month=${Share.getCurrMonth()}`;
+
 		return await HttpRequest.request(url, options);
 	}
 
