@@ -15,11 +15,12 @@ export default class WorkHourTimer {
 		this.holidayList = {};
 		this.dayOffList = {};
 		this.userSession = {};
+		this.userSessionChecker = null;
 	}
 
-	start = async () => {
+	/*start = async () => {
 		const _this = this;
-		setInterval(() => {
+		this.userSessionChecker = setInterval(() => {
 			// 세션정보
 			_this.checkUserSession();
 		}, this.intervalTime);
@@ -34,6 +35,13 @@ export default class WorkHourTimer {
 			_this.checkWorkHour();
 		}, this.intervalTime);
 
+		await _this.checkUserSession();
+		await _this.checkCalendar();
+		await _this.checkWorkHour();
+	}*/
+
+	initialize = async () => {
+		const _this = this;
 		await _this.checkUserSession();
 		await _this.checkCalendar();
 		await _this.checkWorkHour();
@@ -121,17 +129,17 @@ export default class WorkHourTimer {
 			now
 		}
 
-		Logger.println('start...');
-
-		if (params.userSession.code == "401") {
+		if (!params.userSession || params.userSession.code == "401" || Object.entries(params.userSession).length === 0) {
 			// 인증되지 않았습니다.
 			Logger.println("인증되지 않았음. try login.. ");
 			await daouofficeClient.loginByUserConfig();
 			const userSession = await daouofficeClient.getSession();
 
+			Logger.println('로그인 한후에 getSession 가져옴')
+			console.error(userSession)
+
 			params.userSession = userSession;
 		}
-
 
 		await workHourChecker.check(params);
 	}

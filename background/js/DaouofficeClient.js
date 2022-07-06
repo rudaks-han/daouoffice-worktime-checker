@@ -68,7 +68,7 @@ export default class DaouofficeClient {
 		const url = `${this.BASE_URL}/api/user/session`;
 		const response = await HttpRequest.request(url, options);
 
-		if (response.code === '200') {
+		if (response && response.code === '200') {
 			const {id, name, employeeNumber} = response.data;
 			const userInfo = {
 				id,
@@ -91,7 +91,7 @@ export default class DaouofficeClient {
 	async loginByUserConfig() {
 		const userConfig = await this.getUserConfig();
 		Logger.println('#loginByUserConfig')
-		Logger.println(userConfig)
+		console.log(userConfig)
 		const params = {
 			username: userConfig.username,
 			password: userConfig.password

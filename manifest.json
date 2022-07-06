@@ -13,7 +13,8 @@
   "permissions": [
     "notifications",
     "background",
-    "storage"
+    "storage",
+    "alarms"
   ],
   "host_permissions": [
     "https://spectra.daouoffice.com/api/*"
