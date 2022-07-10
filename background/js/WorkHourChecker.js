@@ -13,6 +13,7 @@ export default class WorkHourChecker {
 	}
 
 	check = async params => {
+		console.error("WorkHourChecker check")
 		// 주말인지 여부 체크
 		if (this.isWeekend(params)) {
 			return;

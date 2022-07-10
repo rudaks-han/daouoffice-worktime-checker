@@ -42,7 +42,7 @@ const firebaseApp = new FirebaseApp();
 firebaseApp.start();
 
 const workHourTimer = new WorkHourTimer();
-workHourTimer.initialize();
+//workHourTimer.initialize();
 
 chrome.alarms.create('checkUserSession', { when:Date.now(), periodInMinutes: 5}); // 5분
 chrome.alarms.create('checkCalendar', {when:Date.now(), periodInMinutes: 60}); // 60분

@@ -84,6 +84,7 @@ export default class WorkHourTimer {
 	}
 
 	checkWorkHour = async () => {
+		console.error("___ starting workHour checking.")
 		const userConfig = await this.getUserConfig();
 		if (!userConfig || userConfig.useFlag != 'Y') {
 			Logger.println('>>> 출퇴근 체크가 사용하지 않음으로 설정되어 있습니다.');
