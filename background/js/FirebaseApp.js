@@ -85,6 +85,11 @@ class FirebaseApp {
 
 	userConfigChangedCallback = async (snapshot) => {
 		const userConfig = await daouofficeClient.getUserConfig();
+		if (!userConfig) {
+			Logger.error("userConfig not found");
+			return;
+		}
+
 		const {username} = userConfig; // 2014001
 
 		const userConfigValues = snapshot.val();
