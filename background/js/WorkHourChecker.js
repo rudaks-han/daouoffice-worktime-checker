@@ -345,7 +345,7 @@ export default class WorkHourChecker {
 				type: '출근시간'
 			});
 
-			Share.showNotify('출근도장', msg, false);
+			Share.showNotify('출근도장', msg, true);
 		} else {
 			if (name === 'timeline.clockin.duplication') { // 출근이 중복하여 존재합니다.
 				Share.showNotify('출근도장', message, true);
@@ -379,7 +379,7 @@ export default class WorkHourChecker {
 				type: '퇴근시간'
 			});
 
-			Share.showNotify('퇴근도장', msg, false);
+			Share.showNotify('퇴근도장', msg, true);
 		} else {
 			if (name === 'timeline.clockout.duplacation') { // 퇴근이 중복하여 존재합니다.
 				Share.showNotify('퇴근도장', message, true);
