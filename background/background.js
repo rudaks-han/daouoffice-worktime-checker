@@ -1,7 +1,6 @@
 import DaouofficeClient from "./js/DaouofficeClient.js";
 import WorkHourTimer from "./js/WorkHourTimer.js";
 import FirebaseApp from "./js/FirebaseApp.js";
-import Logger from "./js/lib/Logger.js";
 
 const receiveMessage = (request, sender, sendResponse) => {
     requestFn(request)
@@ -42,7 +41,7 @@ const firebaseApp = new FirebaseApp();
 firebaseApp.start();
 
 const workHourTimer = new WorkHourTimer();
-//workHourTimer.initialize();
+workHourTimer.initialize();
 
 chrome.alarms.create('checkUserSession', { when:Date.now(), periodInMinutes: 5}); // 5분
 chrome.alarms.create('checkCalendar', {when:Date.now(), periodInMinutes: 60}); // 60분

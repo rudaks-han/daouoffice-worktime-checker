@@ -13,7 +13,7 @@ export default class WorkHourChecker {
 	}
 
 	check = async params => {
-		console.error("WorkHourChecker check")
+		Logger.debug("WorkHourChecker check");
 		// 주말인지 여부 체크
 		if (this.isWeekend(params)) {
 			return;
@@ -182,7 +182,7 @@ export default class WorkHourChecker {
 
 		if (clockOutCheckType === 'TIME') {
 			if (this.isInRangeClockOut(endWorkTimeDate, parseInt(clockOutBeforeMinute), currDate, now, dayOffList, username)) {
-				this.requestClockOut(userId, username);
+				await this.requestClockOut(userId, username);
 			}
 		} else if (clockOutCheckType === 'RANDOM') {
 			let randomMinuteStorageValue = await StorageUtil.get('afterRandomMinute')
@@ -202,7 +202,7 @@ export default class WorkHourChecker {
 			}
 
 			if (this.isInRangeClockOut(endWorkTimeDate, parseInt(afterMinute), currDate, now, dayOffList, username)) {
-				this.requestClockOut(userId, userId);
+				await this.requestClockOut(userId, userId);
 			}
 		}
 	}
@@ -328,6 +328,9 @@ export default class WorkHourChecker {
 	}
 
 	requestClockIn = async (userId, username) => {
+		Logger.error(' ======> 출근시간 체크 시도');
+		Logger.println("userId: " + userId)
+		Logger.println("username: " + username)
 		Logger.println("requestClockIn", false);
 		const response = await daouofficeClient.requestClockIn(userId);
 		const { code, message, name } = response;

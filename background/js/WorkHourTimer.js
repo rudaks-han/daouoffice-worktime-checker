@@ -84,7 +84,6 @@ export default class WorkHourTimer {
 	}
 
 	checkWorkHour = async () => {
-		console.error("___ starting workHour checking.")
 		const userConfig = await this.getUserConfig();
 		if (!userConfig || userConfig.useFlag != 'Y') {
 			Logger.println('>>> 출퇴근 체크가 사용하지 않음으로 설정되어 있습니다.');
@@ -94,9 +93,9 @@ export default class WorkHourTimer {
 		const username = userConfig.sessionUserName;
 		const currDate = Share.getCurrDate();
 		const now = new Date();
-		/*const username = '백명구';
-		const currDate = '2022-06-02';
-		const now = new Date('2022-06-02T06:50:00');*/
+		/*const username = '한경만';
+		const currDate = '2022-08-01';
+		const now = new Date('2022-08-01T06:50:00');*/
 
 		const params = {
 			username,
