@@ -48,10 +48,10 @@ export default class WorkHourChecker {
 		const { currDate } = params;
 		const date = new Date(currDate + 'T12:00:00');
 		if (date.getDay() == 0 || date.getDay() == 6) { // 토, 일 제외
-			Logger.debug(`${logPrefix} 오늘은 주말입니다.`);
+			Logger.debug(`${logPrefix} 오늘은 주말입니다. ${currDate}`);
 			return true;
 		} else {
-			Logger.debug(`${logPrefix} 오늘은 평일입니다.`);
+			Logger.debug(`${logPrefix} 오늘은 평일입니다. ${currDate}`);
 			return false;
 		}
 	}
@@ -60,10 +60,10 @@ export default class WorkHourChecker {
 		const logPrefix = '[공휴일 여부 체크] > ';
 		const { currDate, holidayList } = params;
 		if (holidayList[currDate]) {
-			Logger.debug(`${logPrefix} 오늘은 공휴일입니다.`);
+			Logger.debug(`${logPrefix} 오늘은 공휴일입니다. ${currDate}`);
 			return true;
 		} else {
-			Logger.debug(`${logPrefix} 오늘은 평일입니다.`);
+			Logger.debug(`${logPrefix} 오늘은 평일입니다. ${currDate}`);
 			return false;
 		}
 	}

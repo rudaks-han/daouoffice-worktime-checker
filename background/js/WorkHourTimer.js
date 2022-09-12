@@ -18,7 +18,6 @@ export default class WorkHourTimer {
 		const _this = this;
 		await _this.checkUserSession();
 		await _this.checkCalendar();
-		await _this.checkWorkHour();
 	}
 
 	getUserConfig = async () => {
@@ -94,8 +93,8 @@ export default class WorkHourTimer {
 		const currDate = Share.getCurrDate();
 		const now = new Date();
 		/*const username = '한경만';
-		const currDate = '2022-08-01';
-		const now = new Date('2022-08-01T06:50:00');*/
+		const currDate = '2022-09-12';
+		const now = new Date('2022-08-01T06:40:00');*/
 
 		const params = {
 			username,

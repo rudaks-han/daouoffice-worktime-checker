@@ -65,7 +65,7 @@ class FirebaseApp {
 		const _this = this;
 		const buildRef = ref(this.db, `build-status`);
 		onValue(buildRef, (snapshot) => {
-			Logger.println('dummy test callback');
+			Logger.info('dummy test callback');
 		});
 	}
 
@@ -101,8 +101,8 @@ class FirebaseApp {
 				data: userConfig
 			})
 
-			Logger.println('userConfigChangedCallback');
-			Logger.println(`[${username}] useFlag changed: ${useFlag}`);
+			Logger.info('userConfigChangedCallback');
+			Logger.info(`[${username}] useFlag changed: ${useFlag}`);
 		}
 	}
 

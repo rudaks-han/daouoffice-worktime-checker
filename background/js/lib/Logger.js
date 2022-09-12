@@ -2,9 +2,9 @@ import Share from "./Share.js";
 
 export default class Logger {
 
-    static LOG_LEVEL = 2;
+    static LOG_LEVEL = 1;
 
-    static println(str, showPrefix = true) {
+    static println(str, showPrefix = false) {
         if (showPrefix) {
             const caller = this.getCaller();
             let callerLog = ``;
@@ -13,7 +13,7 @@ export default class Logger {
             }
             console.log(`[${Share.getFullCurrDate()}] ${str}${callerLog}`);
         } else {
-            console.log(str);
+            console.log(`[${Share.getFullCurrDate()}] ${str}`);
         }
     }
 
@@ -21,8 +21,18 @@ export default class Logger {
         console.error(str);
     }
 
+    static debug(str) {
+        return debug(str, false);
+    }
+
     static debug(str, showPrefix) {
-        if (this.LOG_LEVEL <= 1) {
+        if (this.LOG_LEVEL === 1) {
+            this.println(str, showPrefix);
+        }
+    }
+
+    static info(str, showPrefix) {
+        if (this.LOG_LEVEL === 2) {
             this.println(str, showPrefix);
         }
     }
