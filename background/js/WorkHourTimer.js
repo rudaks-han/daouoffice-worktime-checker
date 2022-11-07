@@ -2,6 +2,7 @@ import DaouofficeClient from "./DaouofficeClient.js";
 import WorkHourChecker  from "./WorkHourChecker.js";
 import Share from "./lib/Share.js";
 import Logger from "./lib/Logger.js";
+import StorageUtil from "./lib/storageUtil.js";
 
 const daouofficeClient = new DaouofficeClient();
 const workHourChecker = new WorkHourChecker();
@@ -93,8 +94,12 @@ export default class WorkHourTimer {
 		const currDate = Share.getCurrDate();
 		const now = new Date();
 		/*const username = '한경만';
-		const currDate = '2022-09-12';
-		const now = new Date('2022-08-01T06:40:00');*/
+		const currDate = '2022-11-08';
+		const currTime = '16:05:00';
+		const now = new Date(`${currDate}T${currTime}`);
+		await StorageUtil.set({
+			'clockOutDateStorageKey': '222222'
+		});*/
 
 		const params = {
 			username,
@@ -106,7 +111,7 @@ export default class WorkHourTimer {
 			now
 		}
 
-		if (!params.userSession || params.userSession.code == "401" || Object.entries(params.userSession).length === 0) {
+		if (this.isNotAuthenticated(params)) {
 			// 인증되지 않았습니다.
 			Logger.println("WorkHourTimer#userSession ==> 인증되지 않았음. try login.. ");
 			let userSession = await daouofficeClient.getSession();
@@ -119,5 +124,9 @@ export default class WorkHourTimer {
 		}
 
 		await workHourChecker.check(params);
+	}
+
+	isNotAuthenticated = params => {
+		return !params.userSession || params.userSession.code == "401" || Object.entries(params.userSession).length === 0;
 	}
 }
