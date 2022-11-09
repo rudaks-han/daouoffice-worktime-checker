@@ -202,7 +202,7 @@ export default class WorkHourChecker {
 			}
 
 			if (this.isInRangeClockOut(endWorkTimeDate, parseInt(afterMinute), currDate, now, dayOffList, username)) {
-				await this.requestClockOut(userId, userId);
+				await this.requestClockOut(userId, username);
 			}
 		}
 	}
