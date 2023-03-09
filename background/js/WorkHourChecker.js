@@ -239,6 +239,7 @@ export default class WorkHourChecker {
 			clockInMarkingTime = Share.addMinutes(startWorkTimeDate, -minuteBeforeClockIn); // 기준시간 07:55
 		}
 
+		console.log('출근 찍을 시간: ' + clockInMarkingTime);
 		if (now >= clockInMarkingTime) {
 			let validTime = Share.addMinutes(startWorkTimeDate, 60); // 기준시간 09:00
 			if (now > validTime) {
@@ -277,6 +278,7 @@ export default class WorkHourChecker {
 			clockOutMarkingTime = Share.addMinutes(endWorkTimeDate, minuteAfterClockOut);
 		}
 
+		console.log('퇴근 찍을 시간: ' + clockOutMarkingTime);
 		if (now >= clockOutMarkingTime) {
 			let validTime = Share.addMinutes(endWorkTimeDate, 60); // 기준시간 18:00 (17:00 + 01:00)
 			if (now > validTime) {
