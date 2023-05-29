@@ -44,10 +44,10 @@ firebaseApp.start();
 const workHourTimer = new WorkHourTimer();
 workHourTimer.initialize();
 
-const addSeconds = Date.now() + 10;
+const addSeconds = Date.now();
 chrome.alarms.create('checkUserSession', { when:Date.now(), periodInMinutes: 5}); // 5분
-chrome.alarms.create('checkCalendar', {when:Date.now(), periodInMinutes: 1}); // 60분
-chrome.alarms.create('checkWorkHour', {when:addSeconds, periodInMinutes: 1}); // 1분
+chrome.alarms.create('checkCalendar', {when:Date.now(), periodInMinutes: 60}); // 60분
+chrome.alarms.create('checkWorkHour', {when:Date.now(), periodInMinutes: 1}); // 1분
 
 chrome.alarms.onAlarm.addListener(alarm => {
     const { name, periodInMinutes, scheduledTime } = alarm;

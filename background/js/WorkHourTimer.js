@@ -26,7 +26,7 @@ export default class WorkHourTimer {
 	}
 
 	checkUserSession = async () => {
-		Logger.println("WorkHourTimer#checkUserSession ==> 인증되지 않았음. try login.. ");
+		//Logger.println("WorkHourTimer#checkUserSession ==> 인증되지 않았음. try login.. ");
 		let userSession = await daouofficeClient.getSession();
 		if (!(userSession && userSession.code === '200')) {
 			Logger.println("재로그인 후 getSession 요청");
@@ -113,7 +113,6 @@ export default class WorkHourTimer {
 
 		if (this.isNotAuthenticated(params)) {
 			// 인증되지 않았습니다.
-			Logger.println("WorkHourTimer#userSession ==> 인증되지 않았음. try login.. ");
 			let userSession = await daouofficeClient.getSession();
 			if (!(userSession && userSession.code === '200')) {
 				Logger.println("재로그인 후 getSession 요청");

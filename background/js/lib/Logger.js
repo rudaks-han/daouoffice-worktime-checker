@@ -21,18 +21,24 @@ export default class Logger {
         console.error(str);
     }
 
+    static trace(str) {
+        if (this.LOG_LEVEL <= 0) {
+            this.println(str);
+        }
+    }
+
     static debug(str) {
         return debug(str, false);
     }
 
     static debug(str, showPrefix) {
-        if (this.LOG_LEVEL === 1) {
+        if (this.LOG_LEVEL <= 1) {
             this.println(str, showPrefix);
         }
     }
 
     static info(str, showPrefix) {
-        if (this.LOG_LEVEL === 2) {
+        if (this.LOG_LEVEL <= 2) {
             this.println(str, showPrefix);
         }
     }
